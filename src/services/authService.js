@@ -33,24 +33,35 @@ function saveUsers(users) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users))
 }
 
-// 确保预置教师账户存在
-function ensureTeacherAccount(users) {
-  const teacherExists = users.some(u => u.role === 'teacher')
-  if (!teacherExists) {
-    // 同步创建教师账户（首次初始化时）
-    const salt = generateSalt()
-    // 使用简单哈希（同步方式）
-    const simpleHash = btoa('admin123' + salt).slice(0, 64)
-    users.push({
-      id: 'u_teacher_001',
-      username: 'teacher',
-      passwordHash: simpleHash,
-      salt,
-      role: 'teacher',
-      createdAt: new Date().toISOString()
-    })
-    saveUsers(users)
+// 确保预置教师账户存在（异步，统一用 SHA-256）
+async function ensureTeacherAccount() {
+  const users = getUsers()
+  const teacherIdx = users.findIndex(u => u.role === 'teacher')
+
+  if (teacherIdx >= 0) {
+    // 已有教师账户：验证哈希方法是否一致（修复旧版 btoa bug）
+    const teacher = users[teacherIdx]
+    const testHash = await hashPassword('admin123', teacher.salt)
+    if (teacher.passwordHash !== testHash) {
+      // 旧版 btoa 哈希不匹配 → 用 SHA-256 重建
+      teacher.passwordHash = testHash
+      saveUsers(users)
+    }
+    return users
   }
+
+  // 首次创建教师账户
+  const salt = generateSalt()
+  const passwordHash = await hashPassword('admin123', salt)
+  users.push({
+    id: 'u_teacher_001',
+    username: 'teacher',
+    passwordHash,
+    salt,
+    role: 'teacher',
+    createdAt: new Date().toISOString()
+  })
+  saveUsers(users)
   return users
 }
 
@@ -64,7 +75,7 @@ export const authService = {
       throw new Error('密码至少4个字符')
     }
 
-    const users = ensureTeacherAccount(getUsers())
+    const users = await ensureTeacherAccount()
 
     // 检查用户名是否已存在
     if (users.some(u => u.username === username)) {
@@ -94,7 +105,7 @@ export const authService = {
   },
 
   async login(username, password) {
-    const users = ensureTeacherAccount(getUsers())
+    const users = await ensureTeacherAccount()
     const user = users.find(u => u.username === username)
 
     if (!user) {
