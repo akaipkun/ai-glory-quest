@@ -3,6 +3,7 @@ import { watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import InkBackground from './components/ink/InkBackground.vue'
 import AccountBadge from './components/ink/AccountBadge.vue'
+import InkCursor from './components/ink/InkCursor.vue'
 import { useGameStore } from './stores/gameStore'
 import { useAuthStore } from './stores/authStore'
 
@@ -33,6 +34,9 @@ watch(() => route.path, (path) => {
       <!-- 全局账户印章（右上角） -->
       <AccountBadge />
 
+      <!-- 水墨笔刷光标 -->
+      <InkCursor />
+
       <router-view v-slot="{ Component }">
         <transition name="page" mode="out-in">
           <component :is="Component" />
@@ -52,6 +56,18 @@ watch(() => route.path, (path) => {
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+  cursor: none;
+}
+
+/* Hide default cursor on interactive elements too */
+#ink-app :deep(a),
+#ink-app :deep(button),
+#ink-app :deep(input),
+#ink-app :deep(select),
+#ink-app :deep(textarea),
+#ink-app :deep([role="button"]),
+#ink-app :deep(.clickable) {
+  cursor: none;
 }
 
 .ink-footer {

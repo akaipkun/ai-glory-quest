@@ -67,6 +67,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
 import { useAuthStore } from '../stores/authStore'
+import { celebrate } from '../utils/confetti.js'
 import FieryEyes from '../components/level3/FieryEyes.vue'
 import BeastIdentifier from '../components/level3/BeastIdentifier.vue'
 import AdversarialExamples from '../components/level3/AdversarialExamples.vue'
@@ -84,7 +85,7 @@ let introAnimId = null
 function startLevel() { showIntro.value = false }
 function goToStep(index) { if (auth.isGodMode) { currentStep.value = index } }
 function goNext() { if (currentStep.value < 2) { game.earnStepBadge(3, currentStep.value); currentStep.value++ } }
-function finishLevel(score = 85) { game.completeLevel(3, score); showCompletion.value = true }
+function finishLevel(score = 85) { game.completeLevel(3, score); showCompletion.value = true; celebrate('medium') }
 function goNextLevel() { game.unlockLevel(4); router.push('/level/4') }
 
 function initIntro() {
@@ -121,6 +122,7 @@ onUnmounted(() => { if (introAnimId) cancelAnimationFrame(introAnimId) })
 <style scoped>
 .level3 { min-height: 100vh; position: relative; }
 .level3__intro { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: var(--paper); }
+.level3__intro::before { content: ''; position: absolute; inset: 0; background: url('/images/level3-illustration.png') center/cover; opacity: 0.08; pointer-events: none; }
 .level3__intro-canvas { position: absolute; inset: 0; pointer-events: none; }
 .level3__intro-content { position: relative; z-index: 1; text-align: center; max-width: 500px; padding: 24px; }
 .level3__intro-icon { font-size: 4rem; margin-bottom: 24px; display: inline-block; }

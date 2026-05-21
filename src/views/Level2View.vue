@@ -97,6 +97,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
 import { useAuthStore } from '../stores/authStore'
+import { celebrate } from '../utils/confetti.js'
 import HeroTraining from '../components/level2/HeroTraining.vue'
 import AlchemyFurnace from '../components/level2/AlchemyFurnace.vue'
 import ArenaRanking from '../components/level2/ArenaRanking.vue'
@@ -147,6 +148,7 @@ function finishLevel(score) {
   game.completeLevel(2, score)
   showCompletion.value = true
   initCompleteCanvas()
+  celebrate('medium')
 }
 
 function goNextLevel() {
@@ -263,6 +265,7 @@ onUnmounted(() => {
   justify-content: center;
   background: var(--paper);
 }
+.level2__intro::before { content: ''; position: absolute; inset: 0; background: url('/images/level2-illustration.png') center/cover; opacity: 0.08; pointer-events: none; }
 
 .level2__intro-canvas {
   position: absolute;

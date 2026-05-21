@@ -314,6 +314,12 @@ watch(() => auth.isGodMode, () => {
   padding: 32px 24px 80px;
   max-width: 1060px;
   margin: 0 auto;
+  position: relative;
+}
+.bestiary::before {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background: url('/images/bestiary-bg.png') center/cover;
+  opacity: 0.04; pointer-events: none;
 }
 
 .bestiary__nav {
@@ -359,11 +365,16 @@ watch(() => auth.isGodMode, () => {
 
 .folio-card {
   position: relative; border: 1px solid var(--ink-pale);
-  background: rgba(245, 240, 232, 0.85); transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  background: rgba(245, 240, 232, 0.85); transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   display: flex; flex-direction: column;
+  transform-style: preserve-3d;
 }
 .folio-card--unlocked { border-color: var(--ink-medium); cursor: default; }
-.folio-card--unlocked:hover { border-color: var(--gold); box-shadow: 0 8px 28px rgba(201, 168, 76, 0.1); transform: translateY(-2px); }
+.folio-card--unlocked:hover {
+  border-color: var(--gold);
+  box-shadow: 0 16px 40px rgba(201, 168, 76, 0.14), 0 6px 16px rgba(0,0,0,0.08);
+  transform: perspective(800px) rotateY(-2deg) rotateX(2deg) translateY(-4px);
+}
 .folio-card--locked { opacity: 0.7; }
 
 .folio-card__art {

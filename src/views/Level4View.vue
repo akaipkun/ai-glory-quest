@@ -73,6 +73,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
 import { useAuthStore } from '../stores/authStore'
+import { celebrate } from '../utils/confetti.js'
 import HeroPool from '../components/level4/HeroPool.vue'
 import RankedMatch from '../components/level4/RankedMatch.vue'
 import FinalShowdown from '../components/level4/FinalShowdown.vue'
@@ -114,6 +115,7 @@ function finishLevel(score) {
   game.completeLevel(4, score)
   showCompletion.value = true
   initCompleteCanvas()
+  celebrate('medium')
 }
 
 function goNextLevel() {
@@ -211,6 +213,7 @@ onUnmounted(() => {
 .level4 { min-height: 100vh; position: relative; }
 
 .level4__intro { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: var(--paper); }
+.level4__intro::before { content: ''; position: absolute; inset: 0; background: url('/images/level4-illustration.png') center/cover; opacity: 0.08; pointer-events: none; }
 .level4__intro-canvas { position: absolute; inset: 0; pointer-events: none; }
 .level4__intro-content { position: relative; z-index: 1; text-align: center; max-width: 500px; padding: 24px; }
 .level4__intro-icon { font-size: 4rem; margin-bottom: 24px; display: inline-block; }

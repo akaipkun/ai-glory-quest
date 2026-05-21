@@ -72,6 +72,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
 import { useAuthStore } from '../stores/authStore'
+import { celebrate } from '../utils/confetti.js'
 import TransformationWorkshop from '../components/level5/TransformationWorkshop.vue'
 import LatentSpace from '../components/level5/LatentSpace.vue'
 import AIGeneratedDetection from '../components/level5/AIGeneratedDetection.vue'
@@ -92,7 +93,7 @@ let completeAnimId = null
 function startLevel() { showIntro.value = false }
 function goToStep(index) { if (auth.isGodMode) { currentStep.value = index } }
 function goNext() { if (currentStep.value < 2) { game.earnStepBadge(5, currentStep.value); currentStep.value++ } }
-function finishLevel(score = 80) { game.completeLevel(5, score); showCompletion.value = true; initCompleteCanvas() }
+function finishLevel(score = 80) { game.completeLevel(5, score); showCompletion.value = true; initCompleteCanvas(); celebrate('medium') }
 function goNextLevel() { game.unlockLevel(6); router.push('/level/6') }
 
 function initIntroCanvas() {
@@ -180,6 +181,7 @@ onUnmounted(() => {
 .level5 { min-height: 100vh; position: relative; }
 
 .level5__intro { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: var(--paper); }
+.level5__intro::before { content: ''; position: absolute; inset: 0; background: url('/images/level5-illustration.png') center/cover; opacity: 0.08; pointer-events: none; }
 .level5__intro-canvas { position: absolute; inset: 0; pointer-events: none; }
 .level5__intro-content { position: relative; z-index: 1; text-align: center; max-width: 500px; padding: 24px; }
 .level5__intro-icon { font-size: 4rem; margin-bottom: 24px; display: inline-block; }

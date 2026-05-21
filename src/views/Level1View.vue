@@ -96,6 +96,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
 import { useAuthStore } from '../stores/authStore'
+import { celebrate } from '../utils/confetti.js'
 import TimelineScroll from '../components/level1/TimelineScroll.vue'
 import TuringTest from '../components/level1/TuringTest.vue'
 import ThreeRealms from '../components/level1/ThreeRealms.vue'
@@ -133,6 +134,7 @@ function finishLevel(score = 85) {
   game.completeLevel(1, score)
   showCompletion.value = true
   initCompleteCanvas()
+  celebrate('medium')
 }
 
 function goNextLevel() {
@@ -266,6 +268,7 @@ onUnmounted(() => {
   justify-content: center;
   background: var(--paper);
 }
+.level1__intro::before { content: ''; position: absolute; inset: 0; background: url('/images/level1-illustration.png') center/cover; opacity: 0.08; pointer-events: none; }
 
 .level1__intro-canvas {
   position: absolute;

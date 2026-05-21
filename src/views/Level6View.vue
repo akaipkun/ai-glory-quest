@@ -123,6 +123,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
 import { useAuthStore } from '../stores/authStore'
+import { celebrate } from '../utils/confetti.js'
 import RLTraining from '../components/level6/RLTraining.vue'
 import MultiAgentCoop from '../components/level6/MultiAgentCoop.vue'
 import FiveVFiveBattle from '../components/level6/FiveVFiveBattle.vue'
@@ -153,7 +154,7 @@ const allBadges = [
 function startLevel() { showIntro.value = false }
 function goToStep(index) { if (auth.isGodMode) { currentStep.value = index } }
 function goNext() { if (currentStep.value < 2) { game.earnStepBadge(6, currentStep.value); currentStep.value++ } }
-function finishLevel(score = 85) { game.completeLevel(6, score); showCompletion.value = true; initCompleteCanvas() }
+function finishLevel(score = 85) { game.completeLevel(6, score); showCompletion.value = true; initCompleteCanvas(); celebrate('grand') }
 
 function initIntroCanvas() {
   const canvas = introCanvas.value
@@ -260,6 +261,7 @@ onUnmounted(() => {
 .level6 { min-height: 100vh; position: relative; }
 
 .level6__intro { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: var(--paper); }
+.level6__intro::before { content: ''; position: absolute; inset: 0; background: url('/images/level6-illustration.png') center/cover; opacity: 0.08; pointer-events: none; }
 .level6__intro-canvas { position: absolute; inset: 0; pointer-events: none; }
 .level6__intro-content { position: relative; z-index: 1; text-align: center; max-width: 500px; padding: 24px; }
 .level6__intro-icon { font-size: 4rem; margin-bottom: 24px; display: inline-block; }

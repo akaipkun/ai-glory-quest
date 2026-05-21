@@ -115,48 +115,72 @@ function initHeroCanvas() {
   window.addEventListener('resize', resize)
   resize()
 
-  // 墨水粒子
   const particles = []
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 35; i++) {
     particles.push({
-      x: canvas.width / 2 + (Math.random() - 0.5) * 200,
-      y: canvas.height / 2 + (Math.random() - 0.5) * 100,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: -0.2 - Math.random() * 0.3,
-      size: 2 + Math.random() * 4,
-      life: 1,
-      maxLife: 1
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: -0.1 - Math.random() * 0.2,
+      size: 1.5 + Math.random() * 5,
+      life: Math.random(),
+      maxLife: 1,
+      color: i < 8 ? 'gold' : i < 15 ? 'cinnabar' : 'ink'
     })
   }
 
+  let time = 0
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+    time += 0.005
 
-    // 中心墨迹晕染
-    const gradient = ctx.createRadialGradient(
-      canvas.width / 2, canvas.height / 2 + 20, 0,
-      canvas.width / 2, canvas.height / 2 + 20, 150
-    )
-    gradient.addColorStop(0, 'rgba(26, 26, 26, 0.08)')
-    gradient.addColorStop(0.5, 'rgba(26, 26, 26, 0.04)')
-    gradient.addColorStop(1, 'transparent')
-    ctx.fillStyle = gradient
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    // Large central ink wash
+    const cx = canvas.width / 2, cy = canvas.height / 2
+    for (let ring = 0; ring < 4; ring++) {
+      const r = 60 + ring * 55 + Math.sin(time * 0.7 + ring) * 25
+      const grad = ctx.createRadialGradient(cx + Math.cos(time + ring) * 15, cy + Math.sin(time * 0.6 + ring) * 12, r * 0.3, cx, cy, r)
+      grad.addColorStop(0, `rgba(26, 26, 26, ${0.04 - ring * 0.008})`)
+      grad.addColorStop(1, 'transparent')
+      ctx.fillStyle = grad
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill()
+    }
 
-    // 粒子
+    // Gold glow
+    const goldGrad = ctx.createRadialGradient(cx, cy - 30, 10, cx, cy - 30, 70 + Math.sin(time * 0.5) * 20)
+    goldGrad.addColorStop(0, 'rgba(201, 168, 76, 0.06)')
+    goldGrad.addColorStop(1, 'transparent')
+    ctx.fillStyle = goldGrad
+    ctx.beginPath(); ctx.arc(cx, cy - 30, 70, 0, Math.PI * 2); ctx.fill()
+
+    // Cinnabar accent
+    const cinGrad = ctx.createRadialGradient(cx + 50, cy + 20, 5, cx + 50, cy + 20, 45 + Math.sin(time * 0.8) * 15)
+    cinGrad.addColorStop(0, 'rgba(194, 58, 43, 0.05)')
+    cinGrad.addColorStop(1, 'transparent')
+    ctx.fillStyle = cinGrad
+    ctx.beginPath(); ctx.arc(cx + 50, cy + 20, 45, 0, Math.PI * 2); ctx.fill()
+
+    // Floating particles
     for (const p of particles) {
-      p.x += p.vx
+      p.x += p.vx + Math.sin(time * 1.5 + p.life) * 0.2
       p.y += p.vy
-      p.life -= 0.003
+      p.life -= 0.002
       if (p.life <= 0) {
         p.life = p.maxLife
-        p.x = canvas.width / 2 + (Math.random() - 0.5) * 200
-        p.y = canvas.height / 2 + 50
-        p.size = 2 + Math.random() * 4
+        p.x = Math.random() * canvas.width
+        p.y = canvas.height * 0.8 + Math.random() * canvas.height * 0.2
+        p.size = 1.5 + Math.random() * 5
       }
+
+      const alpha = p.life * 0.15
       ctx.beginPath()
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-      ctx.fillStyle = `rgba(26, 26, 26, ${p.life * 0.15})`
+      if (p.color === 'gold') {
+        ctx.fillStyle = `rgba(201, 168, 76, ${alpha * 1.3})`
+      } else if (p.color === 'cinnabar') {
+        ctx.fillStyle = `rgba(194, 58, 43, ${alpha * 1.2})`
+      } else {
+        ctx.fillStyle = `rgba(26, 26, 26, ${alpha})`
+      }
       ctx.fill()
     }
 
@@ -264,7 +288,7 @@ onUnmounted(() => {
 }
 
 .level-card:hover:not(.level-card--locked) {
-  transform: translateX(8px);
+  transform: translateX(8px) scale(1.02);
 }
 
 .level-card__connector {
@@ -302,12 +326,17 @@ onUnmounted(() => {
 .level-card--unlocked:hover .level-card__inner {
   border-color: var(--ink-black);
   background: var(--paper);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 28px rgba(0,0,0,0.1), 0 0 0 3px rgba(201, 168, 76, 0.12);
 }
 
 .level-card--completed .level-card__inner {
   border-color: var(--gold);
   background: rgba(201, 168, 76, 0.05);
+  box-shadow: 0 0 16px rgba(201, 168, 76, 0.06);
+}
+
+.level-card--completed:hover .level-card__inner {
+  box-shadow: 0 0 28px rgba(201, 168, 76, 0.16), 0 4px 20px rgba(0,0,0,0.06);
 }
 
 .level-card--locked .level-card__inner {
