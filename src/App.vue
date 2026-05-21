@@ -1,0 +1,92 @@
+<script setup>
+import { watch } from 'vue'
+import { useRouter } from 'vue-router'
+import InkBackground from './components/ink/InkBackground.vue'
+import { useGameStore } from './stores/gameStore'
+
+const router = useRouter()
+const game = useGameStore()
+
+// 路由变化时更新当前关卡
+watch(() => router.currentRoute.value.path, (path) => {
+  const match = path.match(/\/level\/(\d+)/)
+  if (match) {
+    game.currentLevel = parseInt(match[1])
+  }
+})
+</script>
+
+<template>
+  <div id="ink-app">
+    <InkBackground />
+    <router-view v-slot="{ Component }">
+      <transition name="page" mode="out-in">
+        <component :is="Component" />
+      </transition>
+    </router-view>
+
+    <div class="ink-footer">
+      <div class="ink-footer__line"></div>
+      <span class="ink-footer__text">AI 荣耀闯关 · 水墨科创</span>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+#ink-app {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.ink-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.ink-footer__line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--ink-pale) 20%,
+    var(--ink-light) 50%,
+    var(--ink-pale) 80%,
+    transparent
+  );
+}
+
+.ink-footer__text {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--ink-pale);
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+}
+
+/* 页面过渡 */
+.page-enter-active {
+  animation: page-in 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.page-leave-active {
+  animation: page-out 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes page-in {
+  0% { opacity: 0; filter: blur(8px); transform: scale(0.95); }
+  100% { opacity: 1; filter: blur(0); transform: scale(1); }
+}
+@keyframes page-out {
+  0% { opacity: 1; filter: blur(0); transform: scale(1); }
+  100% { opacity: 0; filter: blur(8px); transform: scale(0.95); }
+}
+</style>
