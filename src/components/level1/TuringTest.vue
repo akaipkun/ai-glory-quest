@@ -1,5 +1,16 @@
 <template>
   <div class="turing">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="图灵测试 · 辨妖辨AI"
+      subtitle="机器能思考吗？—— 图灵测试的前世今生"
+      :principle="'艾伦·图灵在1950年发表了划时代论文《计算机器与智能》，提出了一个大胆的问题：机器能思考吗？为了避免哲学上对「思考「定义的争论，图灵设计了一个可操作的测试——让人类评判者通过文字对话与一个人类和一个机器交流，如果评判者无法可靠地区分哪个是机器，那么这台机器就通过了测试，可以被认为具有「智能「。图灵测试不关心机器是否真的「理解「——它只关心表现。这种行为主义视角至今仍是评估AI系统的重要范式。现代AI（如ChatGPT）在短对话中已能通过简化版图灵测试，但真正意义上的图灵测试——长时间、多领域、无限制对话——仍是巨大挑战。'"
+      :gameMapping="'在「辨妖辨AI「游戏中，三位「仙人「各说一句话——你的任务是判断谁说的话语出自AI、谁出自真人。AI的话语通常表现出：过度结构化、缺乏真实生活细节、概率性措辞（「置信度99.97%「）、回避主观感受。而真人的话语则包含：具体的生活经验、情感波动、不完美的表达。这正是图灵测试的核心——通过语言模式洞察智能的本质。判断正确2/3即可通关。'"
+      :tips="['AI语言特征：过度使用数据/概率术语，回避「我不知道「，缺乏具体时空锚点', '真人语言特征：包含具体时间地点（「昨天「、「那家店「），情感词汇丰富，有不完美语法', '现代大语言模型在短文本上已很难区分——真正的图灵测试需要多轮深度对话', '图灵测试不是智能的充分条件——它只测「看起来像人「，不测「真正理解「']"
+      vizType="default"
+      @close="showPrincipleTip = false"
+    />
     <canvas ref="bgCanvas" class="turing__bg"></canvas>
     <div class="turing__container">
       <h2 class="turing__title fade-in">辨妖辨AI</h2>
@@ -79,9 +90,11 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
 
+const showPrincipleTip = ref(true)
 const bgCanvas = ref(null)
 let animId = null
 

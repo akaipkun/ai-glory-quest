@@ -1,5 +1,17 @@
 <template>
   <div class="ranked-match">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="深度学习优化 · 排位修炼"
+      subtitle="优化器、正则化与模型成长的秘密"
+      :principle="'深度学习模型通过梯度下降来优化参数。学习率控制每步参数更新的幅度——太大可能跳过最优解（震荡），太小收敛太慢。批量大小影响梯度的噪声水平——小批量带来随机性帮助逃离局部最优（SGD效应），大批量梯度更准确但可能卡在鞍点。正则化（L1/L2/Dropout）通过惩罚大权重或随机丢弃神经元来防止过拟合——让模型学到真正的规律而非死记硬背。数据增强通过对训练数据做随机变换来扩充数据集，本质上是一种免费的正则化。迁移学习则利用预训练模型的知识，在小数据集上也能获得好效果——站在巨人的肩膀上。'"
+      :gameMapping="'排位赛的每一局对应一个优化维度：第1局调学习率（步幅）、第2局调批量大小（稳定性）、第3局加正则化（防过拟合）、第4局做数据增强（泛化）、第5局迁移学习（借力打力）、第6局综合调优（融会贯通）。每一局的分数取决于你离最佳参数范围有多近——参数越接近黄金区间，模型综合评分越高，段位也越高。'"
+      :tips="['学习率是深度学习最重要的超参数——建议从0.001开始，观察loss曲线再调整', '小批量训练（8-32）引入的噪声能帮助SGD跳出局部最优，是隐式的正则化', 'Dropout(0.2-0.5)是最常用的正则化手段，相当于每次随机让一部分神经元休息', '数据增强几乎零成本提升泛化能力——翻转、旋转、颜色变换都可看作免费的新数据', '梯度下降的关键：损失函数曲面不是光滑的碗，而是充满鞍点和局部最优的高维地形']"
+      vizType="gradient"
+      @close="showPrincipleTip = false"
+    />
+
     <div class="ranked__container">
       <h2 class="ranked__title fade-in">🏆 排位赛 · 深度学习优化</h2>
       <p class="ranked__subtitle body-text fade-in delay-1">每一局都是一次优化——找到最佳超参数组合，从青铜直冲王者</p>
@@ -122,9 +134,11 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
 
+const showPrincipleTip = ref(true)
 const resultChart = ref(null)
 
 const tiers = [

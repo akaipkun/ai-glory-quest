@@ -1,5 +1,16 @@
 <template>
   <div class="detection">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="AI生成鉴别 · 火眼金睛"
+      subtitle="Deepfake与生成检测——真假世界的边界在哪里"
+      :principle="'AI生成内容检测是生成式AI时代的重要课题。检测方法包括：像素级异常（GAN生成的图像在高频细节、皮肤纹理、毛发边缘有不自然的规律性）、元数据分析（JPEG压缩痕迹、EXIF信息缺失）、生理不协调（不对称的耳饰、不自然的眼神、多余的手指）、语义矛盾（文字拼写错误、背景逻辑不合理）。更深层的检测依赖「AI检测AI「——训练专门的分类器学习真实图像和生成图像的统计分布差异，如频率域中的伪影模式。扩散模型生成的图像在某些频段遗留独特的「指纹「。但这是一场军备竞赛——生成越逼真，检测越困难，两者在对抗中共同进化。'"
+      :gameMapping="'在「AI生成鉴别「中，你需要判断8对图片中哪张是AI生成的。难度从「小白「到「火眼金睛「递增：简单题有明显缺陷（多余手指、文字乱码），困难题几乎无懈可击。每答对一题积累经验值，答错学习错误特征。这个游戏训练你在现实中识别AI生成内容的能力——越来越重要的数字素养技能。判定后系统会解释判断依据：纹理异常、结构不协调、光影逻辑等，帮助你理解AI生成图像的「破绽「。8题全对即可通关！'"
+      :tips="['看手指和牙齿——这是AI生成图像最常见的破绽区域（数量不对、形状诡异）', '看文字——AI生成的图像中文字通常是乱码或模糊笔画', '看光影——AI生成的光影方向可能不一致，阴影落在不该落的地方', '用AI检测AI：训练检测模型学习真实/生成的频域差异，是一场无止境的博弈']"
+      vizType="default"
+      @close="showPrincipleTip = false"
+    />
     <div class="detection__container">
       <h2 class="detection__title fade-in">🎭 真假难辨 · AI生成鉴别</h2>
       <p class="detection__subtitle body-text fade-in delay-1">悟空变的树和真树——你能分辨吗？</p>
@@ -77,8 +88,11 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
+
+const showPrincipleTip = ref(true)
 
 const round = ref(1)
 const selected = ref(null)

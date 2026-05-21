@@ -1,5 +1,17 @@
 <template>
   <div class="hero-pool">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="深度学习架构 · 模型选角"
+      subtitle="CNN vs RNN vs Transformer——不同架构的修炼之道"
+      :principle="'深度学习模型架构的选择决定了模型的擅长领域。CNN（卷积神经网络）通过卷积核提取局部特征，在图像任务上无可匹敌；RNN/LSTM（循环神经网络）通过隐藏状态捕捉序列依赖，适合文本和时间序列；Transformer通过自注意力机制并行处理全局关系，是大语言模型的基石。架构选择 = 为任务选最合适的兵器。'"
+      :gameMapping="'在英雄池中，赵云（CNN）擅图像之战，诸葛亮（RNN）精序列之术，武则天（Transformer）是全能型选手。参数量反映了模型的规模——越大的模型能力越强，但修炼（训练）也更慢。选择不是选最强者，而是选最适合当前任务的英雄。'"
+      :tips="['CNN：参数量适中，训练快，图像任务首选，但不擅长处理长序列依赖', 'RNN/LSTM：参数少但训练慢（串行），适合时序数据，但容易梯度消失', 'Transformer：参数多，训练可并行加速，通用性最强，但小数据集上可能过拟合', '在实际项目中，通常先用简单架构建立基线，再逐步升级到复杂架构']"
+      vizType="network"
+      @close="showPrincipleTip = false"
+    />
+
     <div class="hero__container">
       <h2 class="hero__title fade-in">🏆 英雄池 · 选择模型架构</h2>
       <p class="hero__subtitle body-text fade-in delay-1">不同的英雄阵容适合不同的对局——选择你的模型架构</p>
@@ -70,8 +82,11 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
+
+const showPrincipleTip = ref(true)
 
 const heroes = [
   {

@@ -1,5 +1,17 @@
 <template>
   <div class="hero-training">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      :title="principleTitle"
+      :subtitle="principleSubtitle"
+      :principle="principleText"
+      :gameMapping="principleMapping"
+      :tips="principleTips"
+      :vizType="principleViz"
+      @close="showPrincipleTip = false"
+    />
+
     <div class="training__container">
       <h2 class="training__title fade-in">英雄修炼场</h2>
       <p class="training__subtitle body-text fade-in delay-1">
@@ -98,7 +110,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
 
@@ -106,9 +119,30 @@ const trainCanvas = ref(null)
 let animId = null
 
 const heroes = [
-  { icon: '🗡️', name: '李白', type: '线性回归', desc: '直线攻击，一剑封喉。适合处理线性关系的数据。' },
-  { icon: '🏹', name: '后羿', type: '决策树', desc: '远程精确打击，分支判断。适合分类任务。' },
-  { icon: '🛡️', name: '程咬金', type: '神经网络', desc: '皮糙肉厚，越战越强。适合复杂模式识别。' }
+  {
+    icon: '🗡️', name: '李白', type: '线性回归',
+    desc: '直线攻击，一剑封喉。适合处理线性关系的数据。',
+    principle: '线性回归是机器学习中最基础的算法。它假设目标值与特征之间存在线性关系，通过最小化预测值与真实值之间的均方误差，找到一条最佳拟合直线。就像李白用一柄直剑劈开混沌——在数据的散点中找到那条最能代表趋势的线。',
+    mapping: '在游戏中，你的模型（李白）会不断调整剑锋角度（权重 w 和偏置 b），让预测线越来越贴近真实的训练数据点。每一轮修炼（epoch）都会让剑更准一分。',
+    tips: ['准确率取决于数据中的线性程度——数据越接近一条直线，修炼越容易达到高准确率', '训练轮次越多，剑锋越精准，但超过50轮后提升会越来越小', '如果数据是非线性的，你需要换个英雄（如后羿或程咬金）'],
+    viz: 'curve'
+  },
+  {
+    icon: '🏹', name: '后羿', type: '决策树',
+    desc: '远程精确打击，分支判断。适合分类任务。',
+    principle: '决策树通过一系列"如果-那么"的规则来分裂数据。从根节点开始，每次选择最优特征进行划分，直到每个叶子节点包含纯净的类别。就像后羿的神箭——每一箭都是精准的条件判断，逐层缩小目标范围，最终命中靶心。',
+    mapping: '在游戏中，你的模型（后羿）会在每个决策点（树节点）根据数据特征（如颜色、大小、形状）选择最优分裂方向。分裂越纯粹，准确率越高。但树太深可能"过拟合"——记住了训练数据中的噪声而非规律。',
+    tips: ['决策树的分裂条件基于信息增益或基尼不纯度——数学上保证每次分裂都是当前最优', '树太深会过拟合（死记硬背），太浅会欠拟合（学得不够）', '观察准确率曲线：如果训练准确率高但测试准确率低，说明过拟合了'],
+    viz: 'tree'
+  },
+  {
+    icon: '🛡️', name: '程咬金', type: '神经网络',
+    desc: '皮糙肉厚，越战越强。适合复杂模式识别。',
+    principle: '神经网络由多层神经元组成，每个神经元对输入加权求和后通过激活函数输出。数据从输入层流经多个隐藏层，层层抽象，最终在输出层得到结果。就像程咬金经历百战——每一层都在提炼更高级的特征，从像素到边缘到形状到对象。',
+    mapping: '在游戏中，你的模型（程咬金）的每一层神经元都在学习不同的数据表示。训练过程中，误差从输出层反向传播（反向传播算法），逐层调整每个连接的权重。层数越多，能学习的模式越复杂——但修炼也更慢。',
+    tips: ['神经网络层数越多，能表示的函数越复杂，但需要更多训练轮次才能收敛', '激活函数（如ReLU）引入非线性——没有它，多层网络等价于一层线性变换', '注意观察损失曲线：如果长时间不下降，可能需要调整学习率'],
+    viz: 'network'
+  }
 ]
 
 const selectedHero = ref(null)
@@ -122,8 +156,18 @@ const trainingComplete = ref(false)
 
 const historyData = ref([])
 
+// ── AI 原理浮窗 ──
+const showPrincipleTip = ref(false)
+const principleTitle = computed(() => selectedHero.value !== null ? `${heroes[selectedHero.value].type} 原理` : '')
+const principleSubtitle = computed(() => selectedHero.value !== null ? `英雄「${heroes[selectedHero.value].name}」的修炼之道` : '')
+const principleText = computed(() => selectedHero.value !== null ? heroes[selectedHero.value].principle : '')
+const principleMapping = computed(() => selectedHero.value !== null ? heroes[selectedHero.value].mapping : '')
+const principleTips = computed(() => selectedHero.value !== null ? heroes[selectedHero.value].tips : [])
+const principleViz = computed(() => selectedHero.value !== null ? heroes[selectedHero.value].viz : 'default')
+
 function selectHero(index) {
   selectedHero.value = index
+  showPrincipleTip.value = true  // 先展示 AI 原理
   resetTraining()
 }
 

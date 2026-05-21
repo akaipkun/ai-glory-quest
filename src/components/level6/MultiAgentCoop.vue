@@ -1,5 +1,16 @@
 <template>
   <div class="multi-agent">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="多智能体协作 · 1+1>2的奥秘"
+      subtitle="通信、分工与奖励共享——团队智慧的涌现"
+      :principle="'多智能体强化学习（MARL）中，协作效率取决于三个关键因素：通信频率（智能体间信息交换的密度——太少导致各自为战，太多导致信息过载）、分工策略（专精vs全能——每个智能体聚焦特定子任务还是都能做所有事）、奖励共享（个体奖励vs团队奖励——共享奖励促进合作但可能产生「搭便车「，个体奖励激励个人表现但可能导致竞争）。理想的协作产生「涌现行为「——简单的个体规则组合后，团队展现出超越个体的复杂智能。这类似于蚁群算法——每只蚂蚁行为简单，但蚁群能找到最优路径。在深度学习中，Mixture of Experts（MoE）也是一种分工策略——不同的「专家「网络处理不同类型的输入。'"
+      :gameMapping="'在「团战演练「中，你需要调整三个协作参数来优化五人团队的表现。五个英雄各自有不同特长（坦克、刺客、法师、射手、辅助），通信频率决定他们共享多少战场信息——高通信帮助团队协调但消耗计算资源。分工策略选择让英雄各司其职还是灵活应对。奖励共享比例决定个体利益与团队利益的平衡。调整参数后训练团队，系统会评估团队综合表现。这个环节让你直观体验多智能体系统中的协作权衡。'"
+      :tips="['通信的代价：多智能体通信本身消耗带宽和计算资源——这是MARL中的通信效率问题', 'CTDE范式：集中训练（训练时共享全局信息）+ 分散执行（执行时只用本地观测）', '涌现行为：简单个体的局部交互可能产生复杂的全局模式——这是多智能体系统最迷人的特性', '奖励设计是MARL中最难的问题之一——错误的奖励函数会导致意想不到的次优行为']"
+      vizType="network"
+      @close="showPrincipleTip = false"
+    />
     <div class="ma__container">
       <h2 class="ma__title fade-in">🤝 团战演练 · 多智能体协作</h2>
       <p class="ma__subtitle body-text fade-in delay-1">五个英雄组队——各司其职、互相配合才能赢</p>
@@ -89,8 +100,11 @@
 
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
+
+const showPrincipleTip = ref(true)
 
 const teamCanvas = ref(null)
 const commFreq = ref(5)

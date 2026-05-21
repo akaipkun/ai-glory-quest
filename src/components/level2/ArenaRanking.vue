@@ -1,10 +1,41 @@
 <template>
   <div class="arena">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="模型评估 · 峡谷排位"
+      subtitle="如何公平地比较和选择模型"
+      :principle="'模型评估是机器学习中至关重要的环节。训练出一个模型只是开始——真正的挑战在于确定它在新数据上的表现。核心概念包括：偏差（欠拟合，模型太简单学不到规律）与方差（过拟合，模型死记硬背训练数据）。好的模型需要在偏差和方差之间找到平衡点——这就是著名的偏差-方差权衡。'"
+      :gameMapping="'在排位赛中，你的模型（英雄）需要与其他模型一较高下。准确率只是表面数字——真正决定胜负的是泛化能力（在新对手面前的表现）。装备系统对应AI中的各种优化技巧：数据增强（更多样化的训练经验）、正则化（防止走火入魔）、Adam优化器（更聪明的修炼方法）、早停法（知道何时收手）、交叉验证（更可靠的实力评估）。'"
+      :tips="['偏差高（欠拟合）= 模型太简单，训练和测试准确率都低 → 换更强的模型或加特征', '方差高（过拟合）= 训练准确率高但测试低 → 增加正则化，减少模型复杂度', '装备最多带2件——选择最互补的组合才能发挥最大战力', '排位赛的排名基于泛化准确率（真实战力），不是训练准确率（修炼成绩）']"
+      vizType="network"
+      @close="showPrincipleTip = false"
+    />
+
     <div class="arena__container">
       <h2 class="arena__title fade-in">峡谷排位赛</h2>
       <p class="arena__subtitle body-text fade-in delay-1">
         将你的模型送上擂台，与其他英雄一较高下
       </p>
+
+      <!-- 装备选择 -->
+      <div class="arena__equipment fade-in delay-2">
+        <h3 class="arena__equipment-title">⚒️ 选择装备（最多2件）</h3>
+        <div class="arena__equipment-grid">
+          <div
+            v-for="(eq, i) in equipment"
+            :key="i"
+            class="arena__equip"
+            :class="{ 'arena__equip--active': eq.equipped }"
+            @click="toggleEquip(i)"
+          >
+            <div class="arena__equip-icon">{{ eq.icon }}</div>
+            <div class="arena__equip-name">{{ eq.name }}</div>
+            <div class="arena__equip-bonus mono-text">+{{ eq.bonus }}%</div>
+            <div class="arena__equip-desc">{{ eq.desc }}</div>
+          </div>
+        </div>
+      </div>
 
       <!-- 擂台 -->
       <div class="arena__battle fade-in delay-2">
@@ -12,7 +43,11 @@
           <div class="arena__fighter-icon">{{ playerHero }}</div>
           <div class="arena__fighter-name">你的模型</div>
           <div class="arena__fighter-accuracy mono-text">
-            {{ playerAccuracy.toFixed(1) }}%
+            {{ effectiveAccuracy.toFixed(1) }}%
+            <span v-if="equipmentBonus > 0" class="arena__equip-bonus-tag">(+{{ equipmentBonus }})</span>
+          </div>
+          <div v-if="equipmentBonus > 0" class="arena__fighter-gear">
+            <span v-for="eq in equipment.filter(e => e.equipped)" :key="eq.icon" class="arena__gear-chip">{{ eq.icon }} {{ eq.name }}</span>
           </div>
         </div>
 
@@ -99,14 +134,41 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
+
+const showPrincipleTip = ref(true)
 
 const playerAccuracy = ref(70)
 const playerHero = ref('🗡️')
 const isBattling = ref(false)
 const battleResult = ref(null)
 const wonBattles = ref(0)
+
+// ── 装备系统 ──
+const equipment = ref([
+  { icon: '🪶', name: '数据增强羽', bonus: 3, desc: '随机翻转训练数据，提升泛化', equipped: false, aiConcept: 'Data Augmentation' },
+  { icon: '🛡️', name: '正则化盾', bonus: 2, desc: '惩罚过大权重，防止过拟合', equipped: false, aiConcept: 'L2 Regularization' },
+  { icon: '👢', name: 'Adam之靴', bonus: 4, desc: '自适应学习率，加速收敛', equipped: false, aiConcept: 'Adam Optimizer' },
+  { icon: '🔮', name: '早停法护符', bonus: 2, desc: '验证loss不降即停，防走火入魔', equipped: false, aiConcept: 'Early Stopping' },
+  { icon: '📊', name: '交叉验证披风', bonus: 3, desc: 'K折验证，更可靠的实力评估', equipped: false, aiConcept: 'Cross-Validation' },
+  { icon: '🔬', name: '特征工程镜', bonus: 3, desc: '更好的特征表示，洞察本质', equipped: false, aiConcept: 'Feature Engineering' }
+])
+
+const equippedCount = computed(() => equipment.value.filter(e => e.equipped).length)
+const equipmentBonus = computed(() => equipment.value.filter(e => e.equipped).reduce((sum, e) => sum + e.bonus, 0))
+
+const effectiveAccuracy = computed(() => Math.min(99, playerAccuracy.value + equipmentBonus.value))
+
+function toggleEquip(index) {
+  const eq = equipment.value[index]
+  if (eq.equipped) {
+    eq.equipped = false
+  } else if (equippedCount.value < 2) {
+    eq.equipped = true
+  }
+}
 
 const opponents = [
   { name: '韩信', icon: '⚔️', baseAccuracy: 80 },
@@ -139,7 +201,7 @@ const rankings = computed(() => {
       accuracy: o.baseAccuracy,
       isPlayer: false
     })),
-    { name: '你的模型', icon: playerHero.value, tier: getTier(playerAccuracy.value), accuracy: playerAccuracy.value, isPlayer: true }
+    { name: '你的模型', icon: playerHero.value, tier: getTier(effectiveAccuracy.value), accuracy: effectiveAccuracy.value, isPlayer: true }
   ]
 
   list.sort((a, b) => b.accuracy - a.accuracy)
@@ -173,7 +235,7 @@ function startBattle() {
   battleResult.value = null
 
   setTimeout(() => {
-    const win = playerAccuracy.value > opponentAccuracy.value
+    const win = effectiveAccuracy.value > opponentAccuracy.value
     battleResult.value = win ? 'win' : 'lose'
     if (win) wonBattles.value++
     isBattling.value = false
@@ -297,7 +359,100 @@ defineExpose({ setAccuracy })
   cursor: not-allowed;
 }
 
-/* 战斗结果 */
+/* 装备系统 */
+.arena__equipment {
+  margin-bottom: 32px;
+  padding: 20px;
+  border: 1px solid var(--ink-pale);
+  background: rgba(245, 240, 232, 0.5);
+}
+
+.arena__equipment-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  margin-bottom: 16px;
+  color: var(--ink-black);
+}
+
+.arena__equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.arena__equip {
+  padding: 12px 8px;
+  border: 1px solid var(--ink-pale);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  background: rgba(245, 240, 232, 0.6);
+}
+
+.arena__equip:hover {
+  border-color: var(--ink-medium);
+  transform: translateY(-2px);
+}
+
+.arena__equip--active {
+  border-color: var(--gold) !important;
+  background: rgba(201, 168, 76, 0.08) !important;
+  box-shadow: 0 0 12px rgba(201, 168, 76, 0.12);
+}
+
+.arena__equip-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.arena__equip-name {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+
+.arena__equip-bonus {
+  font-size: 0.7rem;
+  color: var(--cinnabar);
+  margin-bottom: 4px;
+}
+
+.arena__equip-desc {
+  font-size: 0.65rem;
+  color: var(--ink-light);
+  line-height: 1.4;
+}
+
+.arena__equip-bonus-tag {
+  font-size: 0.7rem;
+  color: var(--gold);
+  margin-left: 4px;
+}
+
+.arena__fighter-gear {
+  margin-top: 6px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.arena__gear-chip {
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 600px) {
+  .arena__equipment-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 .arena__battle-result {
   margin-bottom: 32px;
   font-family: var(--font-display);

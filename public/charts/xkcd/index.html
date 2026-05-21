@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XKCD 手绘 · AI荣耀闯关</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.xkcd@1/dist/chart.xkcd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+QingKe+HuangYou&family=Noto+Serif+SC:wght@400;700&display=swap');
+
+:root {
+  --paper: #F5F0E8;
+  --ink: #1A1A1A;
+  --cinnabar: #C23A2B;
+  --gold: #C9A84C;
+  --font-display: 'Ma Shan Zheng', 'ZCOOL QingKe HuangYou', cursive;
+  --font-body: 'Noto Serif SC', serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body {
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  line-height: 1.7;
+  position: relative;
+}
+
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 20%, #EDE4D5 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, #EDE4D5 0%, transparent 50%),
+    var(--paper);
+}
+
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+
+.header {
+  text-align: center; padding: 56px 40px 44px;
+  border-bottom: 3px solid var(--ink);
+  margin: 0 48px;
+}
+.header h1 {
+  font-family: var(--font-display);
+  font-size: 52px; font-weight: 400; color: var(--ink);
+  letter-spacing: 6px;
+  /* xkcd-style slight tilt */
+  transform: rotate(-0.8deg);
+}
+.header .sub {
+  font-size: 15px; color: #6A6A6A; margin-top: 10px;
+  transform: rotate(0.3deg);
+}
+
+.section {
+  max-width: 1100px; margin: 44px auto;
+  padding: 0 24px;
+}
+.section-header {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 20px; padding-left: 8px;
+  border-left: 3px solid var(--ink);
+}
+.section-header .num {
+  font-family: var(--font-display); font-size: 30px; color: var(--cinnabar);
+}
+.section-header h2 {
+  font-family: var(--font-display); font-size: 26px; font-weight: 400;
+  letter-spacing: 3px;
+}
+.section-header p {
+  font-size: 13px; color: #6A6A6A;
+}
+
+/* KPI 印章卡片 */
+.kpi-row {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px;
+  padding: 16px 0 32px;
+}
+.kpi-seal {
+  text-align: center; padding: 28px 20px;
+  border: 3px solid var(--cinnabar); position: relative;
+  transform: rotate(-1deg);
+  animation: seal-pop 0.6s cubic-bezier(0.22,1,0.36,1) both;
+}
+.kpi-seal:nth-child(2) { transform: rotate(0.5deg); animation-delay: 0.15s; }
+.kpi-seal:nth-child(3) { transform: rotate(-0.5deg); animation-delay: 0.3s; }
+@keyframes seal-pop {
+  0% { opacity: 0; transform: scale(0.7) rotate(-8deg); }
+  60% { transform: scale(1.06) rotate(0.5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-1deg); }
+}
+.kpi-seal::after {
+  content: ''; position: absolute; inset: 5px;
+  border: 1px solid rgba(194,58,43,0.35); pointer-events: none;
+}
+.kpi-seal .nb {
+  font-family: var(--font-display); font-size: 52px; color: var(--ink);
+  line-height: 1;
+}
+.kpi-seal .unit { font-family: var(--font-display); font-size: 18px; color: #3A3A3A; }
+.kpi-seal .label { font-size: 14px; color: #6A6A6A; margin-top: 6px; letter-spacing: 2px; }
+.kpi-seal .change { font-size: 12px; color: var(--cinnabar); margin-top: 4px; font-family: var(--font-display); }
+
+/* 图表容器 */
+.chart-box {
+  display: flex; justify-content: center; margin: 20px 0;
+  overflow-x: auto;
+}
+.chart-box svg { max-width: 100%; }
+
+/* 双图并排 */
+.chart-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+@media(max-width: 700px) { .chart-row { grid-template-columns: 1fr; } }
+
+/* 架构 - 手绘边框 */
+.arch-wrap { padding: 8px 0 32px; }
+.arch-layer {
+  border: 2.5px solid var(--ink); padding: 20px 24px;
+  margin-bottom: 28px; position: relative;
+  background: rgba(245,240,232,0.6);
+  /* 模拟手绘不规则 */
+  border-radius: 3px 5px 2px 4px;
+}
+.arch-layer::after {
+  content: ''; position: absolute; inset: 3px;
+  border: 1px dashed rgba(26,26,26,0.2); pointer-events: none;
+}
+.arch-layer .layer-tag {
+  position: absolute; top: -14px; left: 20px;
+  font-family: var(--font-display); font-size: 14px; letter-spacing: 3px;
+  background: var(--paper); padding: 2px 16px; color: var(--cinnabar);
+  border: 2px solid var(--cinnabar);
+  transform: rotate(-2deg);
+}
+.arch-layer.frontend .layer-tag { color: var(--ink); border-color: var(--ink); }
+.arch-layer.service .layer-tag { color: #4A7C6F; border-color: #4A7C6F; }
+.arch-layer.ai .layer-tag { color: var(--cinnabar); border-color: var(--cinnabar); }
+
+.arch-blocks { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+.arch-block {
+  border: 1.5px solid #9A9A9A; padding: 10px 18px;
+  min-width: 100px; text-align: center;
+  border-radius: 2px 4px 1px 3px;
+}
+.arch-block .b-title { font-family: var(--font-display); font-size: 15px; }
+.arch-block .b-desc { font-size: 11px; color: #6A6A6A; margin-top: 3px; }
+.arch-arrow {
+  text-align: center; font-size: 28px; color: #9A9A9A;
+  margin: -10px 0 -6px; font-family: var(--font-display);
+}
+
+.footer {
+  text-align: center; padding: 24px; color: #9A9A9A;
+  font-size: 11px; letter-spacing: 3px; border-top: 1px dashed #C0C0C0;
+  margin: 0 48px;
+}
+
+.fade-up {
+  opacity: 0; transform: translateY(16px);
+  animation: fade-up 0.8s ease forwards;
+}
+@keyframes fade-up { to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="header fade-up">
+  <h1>AI 荣耀闯关 · 数据可视化</h1>
+  <div class="sub">游戏化 AI 可视化学习平台 — 职业院校 · 云计算+数字媒体专业</div>
+</div>
+
+<div class="section fade-up" style="animation-delay:0.1s">
+  <div class="section-header"><span class="num">壹</span><h2>项目关键指标</h2><p>120 名学生试点数据 · 2025–2026 第一学期</p></div>
+  <div class="kpi-row">
+    <div class="kpi-seal"><div><span class="nb">86</span><span class="unit">%</span></div><div class="label">知识掌握率</div><div class="change">↑ +28% vs 传统</div></div>
+    <div class="kpi-seal"><div><span class="nb">4.7</span><span class="unit">/5</span></div><div class="label">学生兴趣评分</div><div class="change">↑ +47% vs 传统</div></div>
+    <div class="kpi-seal"><div><span class="nb">92</span><span class="unit">%</span></div><div class="label">课堂参与度</div><div class="change">↑ +104% vs 传统</div></div>
+  </div>
+</div>
+
+<div class="section fade-up" style="animation-delay:0.2s">
+  <div class="section-header"><span class="num">贰</span><h2>教学应用场景流程</h2><p>单次课 45 分钟 · 5 阶段闭环</p></div>
+  <div class="chart-box"><svg id="chart-flow" width="960" height="200"></svg></div>
+</div>
+
+<div class="section fade-up" style="animation-delay:0.3s">
+  <div class="section-header"><span class="num">叁</span><h2>教学效益对比分析</h2><p>传统教学 vs AI荣耀闯关 · 4 项核心指标</p></div>
+  <div class="chart-box"><svg id="chart-benefit" width="840" height="420"></svg></div>
+</div>
+
+<div class="section fade-up" style="animation-delay:0.4s">
+  <div class="section-header"><span class="num">肆</span><h2>学生反馈数据</h2><p>120 名学生使用后匿名问卷 · 综合满意度 93%</p></div>
+  <div class="chart-row">
+    <div class="chart-box"><svg id="chart-radar" width="440" height="420"></svg></div>
+    <div class="chart-box"><svg id="chart-bars" width="440" height="420"></svg></div>
+  </div>
+</div>
+
+<div class="section fade-up" style="animation-delay:0.5s">
+  <div class="section-header"><span class="num">伍</span><h2>技术架构</h2><p>纯前端 SPA · 浏览器端 AI 推理 · 服务抽象层</p></div>
+  <div class="arch-wrap">
+    <div class="arch-layer frontend"><span class="layer-tag">前 端 层</span>
+      <div class="arch-blocks">
+        <div class="arch-block"><div class="b-title">Vue 3 + Vite</div><div class="b-desc">SPA 框架 · 组件化</div></div>
+        <div class="arch-block"><div class="b-title">Canvas 2D</div><div class="b-desc">水墨粒子特效引擎</div></div>
+        <div class="arch-block"><div class="b-title">Three.js</div><div class="b-desc">3D 炼丹炉可视化</div></div>
+        <div class="arch-block"><div class="b-title">GSAP</div><div class="b-desc">卷轴展开 · 关卡转场</div></div>
+      </div>
+    </div>
+    <div class="arch-arrow">↓</div>
+    <div class="arch-layer service"><span class="layer-tag">服 务 层</span>
+      <div class="arch-blocks">
+        <div class="arch-block"><div class="b-title">Pinia</div><div class="b-desc">状态管理</div></div>
+        <div class="arch-block"><div class="b-title">authService</div><div class="b-desc">SHA-256 · localStorage</div></div>
+        <div class="arch-block"><div class="b-title">scoreService</div><div class="b-desc">成绩持久化</div></div>
+      </div>
+    </div>
+    <div class="arch-arrow">↓</div>
+    <div class="arch-layer ai"><span class="layer-tag">AI 推 理 层</span>
+      <div class="arch-blocks">
+        <div class="arch-block"><div class="b-title">TensorFlow.js</div><div class="b-desc">浏览器端 ML 框架</div></div>
+        <div class="arch-block"><div class="b-title">MobileNet</div><div class="b-desc">图像分类 · 特征提取</div></div>
+        <div class="arch-block"><div class="b-title">Q-Learning</div><div class="b-desc">强化学习智能体</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">XKCD HAND-DRAWN STYLE · POWERED BY CHART.XKCD</div>
+
+<script>
+(function(){
+  /* chart.xkcd uses SVG rendering.
+     It provides: Bar, StackedBar, Line, Pie, Radar, XY, Scatter.
+     We use:
+     - Bar for benefit comparison (chart 2)
+     - Radar for feedback (chart 3)
+     - Bar for dimension scores (chart 3 right side)
+     - Line for scenario flow (chart 1) — stepped line shows sequence
+     - Also KPI bar (chart 1)
+  */
+
+  var fontFam = 'Ma Shan Zheng, ZCOOL QingKe HuangYou, cursive';
+
+  // ===== Chart 1: Scenario Flow as Line/Stepped =====
+  new chartXkcd.Line(document.getElementById('chart-flow'), {
+    title: '教学场景流程 · 5 阶段闭环 (45 min)',
+    xLabel: '',
+    yLabel: '',
+    data: {
+      labels: ['教师导入','学生闯关','实时反馈','通关奖励','教师评估'],
+      datasets: [{
+        label: '课堂阶段',
+        data: [1, 2, 3, 2.5, 1.5]
+      }]
+    },
+    options: {
+      yTickCount: 3,
+      dataColors: ['#1A1A1A'],
+      fontFamily: fontFam,
+      showLegend: false,
+      unxkcdify: false
+    }
+  });
+
+  // ===== Chart 2: Benefit Comparison Bar =====
+  new chartXkcd.Bar(document.getElementById('chart-benefit'), {
+    title: '传统教学 vs AI荣耀闯关 · 教学效益对比',
+    xLabel: '',
+    yLabel: '',
+    data: {
+      labels: ['学习兴趣(/5)', '知识掌握率(%)', '课堂参与度(%)', '课后练习(h/周)'],
+      datasets: [
+        { label: '传统教学', data: [3.2, 58, 45, 0.8] },
+        { label: 'AI荣耀闯关', data: [4.7, 86, 92, 3.5] }
+      ]
+    },
+    options: {
+      yTickCount: 5,
+      dataColors: ['#C0C0C0', '#1A1A1A'],
+      fontFamily: fontFam,
+      showLegend: true,
+      legendPosition: chartXkcd.config.positionType.upRight
+    }
+  });
+
+  // ===== Chart 3a: Radar for student feedback =====
+  new chartXkcd.Radar(document.getElementById('chart-radar'), {
+    title: '学生反馈 · 4 维度评分',
+    data: {
+      labels: ['趣味性', '知识易懂', '互动体验', '愿意推荐'],
+      datasets: [{
+        label: 'AI荣耀闯关',
+        data: [4.8, 4.5, 4.6, 4.7]
+      }]
+    },
+    options: {
+      showLabels: true,
+      ticksCount: 3,
+      dotSize: 1.2,
+      showLegend: true,
+      legendPosition: chartXkcd.config.positionType.upRight,
+      dataColors: ['#C23A2B'],
+      fontFamily: fontFam
+    }
+  });
+
+  // ===== Chart 3b: Dimension score bars =====
+  new chartXkcd.Bar(document.getElementById('chart-bars'), {
+    title: '维度评分详情 + 综合满意度 93%',
+    xLabel: '',
+    yLabel: '',
+    data: {
+      labels: ['趣味性', '知识易懂', '互动体验', '愿意推荐'],
+      datasets: [{
+        label: '评分 (满分5)',
+        data: [4.8, 4.5, 4.6, 4.7]
+      }]
+    },
+    options: {
+      yTickCount: 3,
+      dataColors: ['#C23A2B'],
+      fontFamily: fontFam,
+      showLegend: false
+    }
+  });
+
+})();
+</script>
+</body>
+</html>

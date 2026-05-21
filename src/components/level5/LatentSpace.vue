@@ -1,5 +1,16 @@
 <template>
   <div class="latent">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="潜空间漫游 · GAN与扩散模型"
+      subtitle="Latent Space——所有变化之间的隐藏桥梁"
+      :principle="'潜空间（Latent Space）是生成模型内部的一个低维、连续的向量空间，用于表示数据的高层特征。想象所有可能的「椅子「都能用几个维度描述：腿的粗细(0-1)、靠背高度(0-1)、材质软硬(0-1)——这三维空间就是椅子的潜空间。GAN（生成对抗网络）通过生成器学习从潜空间到真实图像的映射，判别器鉴别真伪，两者博弈使生成越来越逼真。扩散模型（Stable Diffusion等）则从纯噪声出发，逐步去噪还原清晰图像——潜空间中的每个点对应一幅可能的图像。两个潜空间点之间的线性插值，会产生「渐变「效果（如猫变狗、老虎变狮子），这正是「72变「的数学本质——在潜空间中连续行走，就能产生无限种变化。'"
+      :gameMapping="'在「潜空间漫游「中，你可以操纵三种变化对：🐯→🦁（老虎变狮子，动物间潜空间插值）、🏔️→🏝️（山变海岛，场景间的形态转变）、🚗→✈️（汽车变飞机，交通工具潜空间穿越）。拖动插值滑块在0%-100%之间移动，观察两个端点之间「半老虎半狮子「的融合形态——这就是潜空间线性插值。右侧的Canvas可视化展示潜空间点阵——每个点代表一种可能的变化状态，蓝色高亮点是你在潜空间中的当前位置。这就是生成式AI「72变「的核心——在潜空间中自由漫步！'"
+      :tips="['GAN由生成器和判别器两个网络对抗训练——像造假者和警察的博弈', '扩散模型是当前最先进的图像生成方法——通过逐步去噪从潜空间还原图像', '潜空间插值（latent interpolation）是生成模型中最优雅的特性——在概念之间平滑过渡', '条件生成（Conditional Generation）通过给潜空间加上「条件向量「来控制生成方向']"
+      vizType="network"
+      @close="showPrincipleTip = false"
+    />
     <div class="latent__container">
       <h2 class="latent__title fade-in">🌀 变化之道 · 潜空间漫游</h2>
       <p class="latent__subtitle body-text fade-in delay-1">72变之间是有联系的——"潜空间"就是所有变化之间的桥梁</p>
@@ -66,8 +77,11 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
+
+const showPrincipleTip = ref(true)
 
 const spaceCanvas = ref(null)
 const creatureCanvases = ref([])

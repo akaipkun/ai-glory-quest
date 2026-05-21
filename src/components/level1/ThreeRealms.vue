@@ -1,5 +1,16 @@
 <template>
   <div class="realms">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="AI 三界 · 三种智能范式"
+      subtitle="符号主义、连接主义、行为主义——AI的三条修行之路"
+      :principle="'人工智能的发展史上有三种主导范式。符号主义（Symbolicism）认为智能来源于符号操作和逻辑推理——知识用规则和符号表示，推理就是搜索。连接主义（Connectionism）认为智能来源于大量简单单元（神经元）的并行连接——知识分布存储在连接权重中，学习就是调整这些权重。行为主义（Behaviorism/强化学习）认为智能来源于与环境的交互——通过试错和奖励信号学习最优行为策略，不关心内部表示。现代AI（如大语言模型）实际上融合了这三种范式：连接主义的神经网络架构、符号主义的语言符号处理、以及行为主义的RLHF（人类反馈强化学习）对齐训练。'"
+      :gameMapping="'在「AI三界「游戏中，你需要将8个AI概念卡片拖入正确的山峰。符号之山（锐利棱角，代表逻辑的精确）收纳专家系统、知识图谱、决策树——这些依赖显式规则和符号推理的技术。连接之山（圆润弧线，代表神经的柔韧）收纳深度学习、CNN、GPT——这些基于神经网络的连接主义技术。行为之山（层叠阶梯，代表试错的阶梯）收纳AlphaGo、自动驾驶——这些依赖强化学习和环境交互的技术。只有理解了三种范式的核心区别，才能正确归类。'"
+      :tips="['符号主义 = 逻辑 + 规则 + 搜索（如专家系统）—— 像数学证明一样精确', '连接主义 = 神经元 + 权重 + 反向传播（如CNN/GPT）—— 像大脑一样学习', '行为主义 = 动作 + 奖励 + 试错（如AlphaGo）—— 像婴儿学走路一样探索', '现代AI系统往往是三种范式的混合体——GPT既用神经网络也处理符号也做RLHF']"
+      vizType="default"
+      @close="showPrincipleTip = false"
+    />
     <canvas ref="bgCanvas" class="realms__bg"></canvas>
     <div class="realms__container">
       <h2 class="realms__title fade-in">AI 三界</h2>
@@ -22,7 +33,7 @@
           @drop="onDrop(i)"
         >
           <div class="realms__mountain-shape">
-            <svg viewBox="0 0 200 160" class="realms__mountain-svg">
+            <svg viewBox="0 0 200 160" class="realms__mountain-svg" :style="{ color: mountain.svgColor }">
               <path :d="mountainPaths[i]" fill="currentColor" />
             </svg>
           </div>
@@ -86,22 +97,27 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
 
+const showPrincipleTip = ref(true)
 const bgCanvas = ref(null)
 let animId = null
 
 const mountainPaths = [
-  'M100,0 C100,0 160,20 180,60 L200,160 L0,160 L20,60 C20,60 40,0 100,0 Z',
-  'M100,5 C100,5 155,25 175,65 L195,160 L5,160 L25,65 C25,65 45,5 100,5 Z',
-  'M100,0 C100,0 170,15 190,55 L200,160 L0,160 L10,55 C10,55 30,0 100,0 Z'
+  // 符号之山 — 锐利棱角，代表逻辑的精确与刚硬
+  'M100,5 L152,38 L170,85 L200,160 L0,160 L30,85 L48,38 Z',
+  // 连接之山 — 圆润弧线，代表神经网络的柔韧与平滑
+  'M100,5 C152,5 182,42 196,105 L200,160 L0,160 L4,105 C18,42 48,5 100,5 Z',
+  // 行为之山 — 层叠阶梯，代表试错学习的逐步攀登
+  'M100,0 L120,26 L115,46 L148,56 L142,82 L178,96 L168,128 L200,142 L200,160 L0,160 L0,142 L32,128 L22,96 L58,82 L52,56 L85,46 L80,26 Z'
 ]
 
 const mountains = ref([
-  { name: '符号之山', desc: '符号主义 · 逻辑推理', items: [], target: ['专家系统', '知识图谱', '决策树'] },
-  { name: '连接之山', desc: '连接主义 · 神经网络', items: [], target: ['深度学习', 'CNN', 'GPT'] },
-  { name: '行为之山', desc: '行为主义 · 强化学习', items: [], target: ['AlphaGo', '自动驾驶'] }
+  { name: '符号之山', desc: '符号主义 · 逻辑推理', items: [], target: ['专家系统', '知识图谱', '决策树'], svgColor: '#3a5a5a' },
+  { name: '连接之山', desc: '连接主义 · 神经网络', items: [], target: ['深度学习', 'CNN', 'GPT'], svgColor: '#6a4a7c' },
+  { name: '行为之山', desc: '行为主义 · 强化学习', items: [], target: ['AlphaGo', '自动驾驶'], svgColor: '#8b4a3a' }
 ])
 
 const allCards = ref([

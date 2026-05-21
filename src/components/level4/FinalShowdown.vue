@@ -1,5 +1,17 @@
 <template>
   <div class="final-showdown">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="模型对决 · 泛化即王道"
+      subtitle="偏差-方差权衡与模型综合评估"
+      :principle="'在深度学习中，模型的真正实力不在于训练集上的表现，而在于对未见过的数据（测试集）的泛化能力。偏差（Bias）反映模型的学习能力——偏差高意味着欠拟合，模型太简单学不到规律。方差（Variance）反映模型对训练数据噪声的敏感度——方差高意味着过拟合，模型死记硬背而非理解。最优的模型在偏差和方差之间取得平衡——这就是著名的偏差-方差权衡。综合评分 = 准确率 × 泛化能力 × 推理速度的加权，反映了模型的实战能力。'"
+      :gameMapping="'在巅峰对决中，你的模型将与Boss模型一较高下。HP条代表模型在对抗中的表现——你的综合评分越高，能抵消的Boss伤害越多。预测胜率基于评分差：评分每高1分，胜率约高1.5%。即使评分稍低也可能逆袭（泛化的随机性），但高评分让胜利更有保障。优化水平 > 88分即可封王——这是在准确率、泛化和效率之间的精妙平衡。'"
+      :tips="['过拟合信号：训练准确率很高但验证准确率低 → 加正则化或Dropout', '欠拟合信号：训练和验证准确率都低 → 增加模型复杂度或训练轮次', '集成学习（多个模型投票）可以显著降低方差，是竞赛中的常用技巧', '模型部署时要考虑推理速度——参数量大的模型虽然准确但可能太慢']"
+      vizType="default"
+      @close="showPrincipleTip = false"
+    />
+
     <div class="final__container">
       <h2 class="final__title fade-in">⚔️ 巅峰对决 · 最强王者决赛</h2>
       <p class="final__subtitle body-text fade-in delay-1">你的模型 vs 系统Boss模型——谁才是真正的王者？</p>
@@ -134,6 +146,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const props = defineProps({
   score: { type: Number, default: 60 }
@@ -141,6 +154,7 @@ const props = defineProps({
 
 const emit = defineEmits(['complete'])
 
+const showPrincipleTip = ref(true)
 const playerScore = ref(props.score)
 const battleCanvas = ref(null)
 const playerHp = ref(100)

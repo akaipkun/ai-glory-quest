@@ -1,5 +1,16 @@
 <template>
   <div class="workshop">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="提示词工程 · 七十二变的咒语"
+      subtitle="Prompt Engineering——与生成式AI对话的艺术"
+      :principle="'提示词工程（Prompt Engineering）是引导大语言模型和生成式AI产生期望输出的技术。核心原理：模型不是「理解「你的话，而是基于训练数据中的统计模式做条件生成——提示词定义了生成的条件分布。好的提示词就像一个精准的约束条件，把模型的输出分布压缩到你想要的区域。关键技巧包括：角色设定（「你是一位水墨画大师「）、风格约束（「写意山水风格，墨分五色「）、细节描述（具体颜色、构图、光影）、负面提示（排除不想要的元素）。在图像生成中，提示词被CLIP等文本编码器转化为特征向量，指导扩散模型或GAN的生成过程。提示词越精确，生成结果越接近预期。'"
+      :gameMapping="'在「提示词工坊「中，你扮演悟空——说一句「变「的咒语（提示词），AI变出图像。你可以输入任何描述（如「水墨风格的老虎在竹林中漫步「），系统调用免费图像生成API尝试生成。预设的提示词示例展示了不同风格：水墨写意、赛博朋克、工笔花鸟等。提示词的质量直接影响生成结果——模糊的提示词得到模糊的结果，精确的提示词得到惊艳的作品。这就是提示词工程的本质：学会用AI的语言与AI对话！'"
+      :tips="['好的提示词 = 主体 + 风格 + 细节 + 构图 + 排除项 —— 五个要素让生成结果精准', '角色设定prompt如「你是齐白石「能让模型模仿特定风格——这是few-shot prompting的变体', 'Chain-of-Thought prompting让模型展示推理过程，显著提高复杂任务的准确性', '图像生成的负面提示（negative prompt）排除模糊、变形、多余手指等常见问题']"
+      vizType="default"
+      @close="showPrincipleTip = false"
+    />
     <div class="workshop__container">
       <h2 class="workshop__title fade-in">🖌️ 变身术 · 提示词工坊</h2>
       <p class="workshop__subtitle body-text fade-in delay-1">悟空喊一声"变"——你说一句提示词，AI就能变出万物</p>
@@ -96,8 +107,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
+
+const showPrincipleTip = ref(true)
 
 const promptText = ref('')
 const creativity = ref(5)

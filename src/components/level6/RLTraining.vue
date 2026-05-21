@@ -1,5 +1,16 @@
 <template>
   <div class="rl-training">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="强化学习 · 从试错中学会决策"
+      subtitle="Q-Learning、探索与利用——单智能体的修炼之道"
+      :principle="'强化学习（Reinforcement Learning）是机器学习的第三范式——智能体通过与环境交互、接收奖励或惩罚信号来学习最优策略。核心要素包括：状态（State，智能体所处的环境情况）、动作（Action，智能体可以采取的行为）、奖励（Reward，环境对动作的即时反馈）、策略（Policy，从状态到动作的映射）。Q-Learning是最经典的强化学习算法——通过维护Q表（状态-动作价值表）并使用Bellman方程迭代更新Q值，最终学到最优策略。核心权衡：探索（Exploration，尝试新动作以获得更多信息）vs 利用（Exploitation，选择已知最优动作以获得最大奖励）。ε-greedy策略以概率ε随机探索，以概率1-ε选择最优动作——这是平衡探索与利用的经典方法。'"
+      :gameMapping="'在「新手训练营「中，英雄（智能体）需要在5×5网格世界中从起点(S)出发，避开陷阱(X)，找到宝藏(T)。每一步对应RL的一个决策周期：英雄根据当前位置（状态）选择一个方向移动（动作），踩到空地获得小额负奖励（-1，鼓励快速到达），踩到陷阱获得大额负奖励（-10），到达宝藏获得大额正奖励（+20）。Q-Learning通过试错学习每个格子的最优移动方向——训练轮数越多，英雄越熟悉环境，到达宝藏越快。右侧的Q值热力图展示每个格子的价值评估：绿色=高价值路径，红色=危险区域（陷阱）。这就是RL的核心——从试错中学习最优策略！'"
+      :tips="['Q-Learning是off-policy算法——学习最优策略，但可以用随机策略收集经验', '探索率ε通常从0.9逐渐衰减到0.05——早期多探索，后期多利用', '深度强化学习（DQN）用神经网络替代Q表——可以处理连续状态空间（如图像输入）', 'AlphaGo是强化学习的巅峰应用——结合了深度神经网络+蒙特卡洛树搜索+自我对弈']"
+      vizType="default"
+      @close="showPrincipleTip = false"
+    />
     <div class="rl__container">
       <h2 class="rl__title fade-in">🏋️ 新手训练营 · 单智能体强化学习</h2>
       <p class="rl__subtitle body-text fade-in delay-1">新英雄进入训练营——从试错中学会找到宝藏</p>
@@ -101,9 +112,11 @@
 
 <script setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
 
+const showPrincipleTip = ref(true)
 const heatmapCanvas = ref(null)
 const gridSize = 5
 const grid = [

@@ -1,5 +1,17 @@
 <template>
   <div class="furnace">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="梯度下降 · 炼丹之道"
+      subtitle="超参数如何影响模型修炼"
+      :principle="'梯度下降是机器学习中最核心的优化算法。想象你站在一座山上，蒙着眼睛，想要走到最低点。你只能感知脚下的坡度——每一步都沿着最陡的下坡方向走。在ML中，损失函数就是这座山的地形，梯度就是脚下的坡度，学习率就是每一步的大小。'"
+      :gameMapping="'在这个炼丹炉中：学习率 = 每次调整丹药配方（参数）的幅度——太大可能炸炉（不收敛），太小修炼太慢。迭代轮数 = 你给丹炉加热的时间——时间越长丹越纯，但超过一定轮数后提升微乎其微。批量大小 = 每次投入丹炉的药材数量——小批量让火焰更活泼（随机梯度噪声有助于跳出局部最优），大批量更稳定但可能卡在假的最低点。'"
+      :tips="['学习率（0.001~0.1）：越小越稳但慢，越大越快但可能震荡甚至发散', '迭代轮数（10~200）：轮数越多，模型参数越接近最优解，但边际收益递减', '批量大小（8~128）：小批量引入随机性（SGD），有助于逃离局部最优；大批量更平滑但可能错过更好的解', '观察火焰颜色：蓝色火=低学习率（稳），橙火=中学习率，红火=高学习率（猛但可能翻车）']"
+      vizType="gradient"
+      @close="showPrincipleTip = false"
+    />
+
     <div class="furnace__container">
       <h2 class="furnace__title fade-in">🔥 炼丹炉</h2>
       <p class="furnace__subtitle body-text fade-in delay-1">
@@ -61,12 +73,15 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
 
 const furnaceCanvas = ref(null)
 let animId = null
 let furnaceParticles = []
+
+const showPrincipleTip = ref(true)
 
 const params = ref([
   { label: '学习率', value: 0.01, min: 0.001, max: 0.1, step: 0.001, unit: '', desc: '越浓(低)=越慢但稳' },

@@ -113,6 +113,30 @@
       </div>
     </div>
 
+    <!-- 隐藏成就 -->
+    <div class="bestiary__mini-badges">
+      <h3 class="bestiary__mini-title">🏅 隐藏成就</h3>
+      <p class="bestiary__mini-hint body-text">这些成就跨越关卡，只有真正的 AI 修行者才能一一解锁</p>
+      <div class="bestiary__mini-grid">
+        <div
+          v-for="def in miniBadgeDefs"
+          :key="def.id"
+          class="mini-badge"
+          :class="{ 'mini-badge--earned': hasMini(def.id) }"
+        >
+          <span class="mini-badge__icon">{{ hasMini(def.id) ? def.icon : '❓' }}</span>
+          <span class="mini-badge__name">{{ hasMini(def.id) ? def.name : '???' }}</span>
+          <span v-if="!hasMini(def.id)" class="mini-badge__hint" :title="def.hint">{{ def.hint }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 知识总纲入口 -->
+    <div class="bestiary__knowledge-entry" @click="$router.push('/knowledge')">
+      <span class="bestiary__knowledge-icon">📜</span>
+      <span class="bestiary__knowledge-text">查看 AI 知识总纲 →</span>
+    </div>
+
     <!-- 底部跋文 -->
     <div class="bestiary__colophon body-text" v-if="collectedCount === 6 && !auth.isGodMode">
       <div class="bestiary__colophon-line"></div>
@@ -166,6 +190,10 @@ const entries = computed(() => {
 })
 
 const collectedCount = computed(() => game.badges.length)
+
+// 隐藏成就列表
+const miniBadgeDefs = computed(() => game.getMiniBadgeDefs())
+function hasMini(id) { return game.hasMiniBadge(id) }
 
 // 各关卡的图文设定（不变）
 const entryDefs = {
@@ -440,4 +468,44 @@ watch(() => auth.isGodMode, () => {
   font-size: 1rem; letter-spacing: 0.1em; display: flex; align-items: center; justify-content: center; gap: 24px;
 }
 .bestiary__colophon-line { width: 80px; height: 1px; background: var(--gold); opacity: 0.3; }
+
+/* 隐藏成就 */
+.bestiary__mini-badges {
+  margin-top: 48px; padding: 28px 24px;
+  border: 1px solid var(--ink-pale);
+  background: rgba(245, 240, 232, 0.4);
+  text-align: center;
+}
+.bestiary__mini-title { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 0.12em; margin-bottom: 6px; }
+.bestiary__mini-hint { font-size: 0.75rem; color: var(--ink-light); margin-bottom: 20px; letter-spacing: 0.04em; }
+
+.bestiary__mini-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+@media (max-width: 700px) { .bestiary__mini-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 440px) { .bestiary__mini-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.mini-badge {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 12px 6px; border: 1px solid var(--ink-pale);
+  transition: all 0.3s ease;
+}
+.mini-badge--earned { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+.mini-badge__icon { font-size: 1.4rem; }
+.mini-badge__name { font-family: var(--font-display); font-size: 0.7rem; letter-spacing: 0.06em; }
+.mini-badge__hint {
+  font-family: var(--font-body); font-size: 0.6rem; color: var(--ink-pale);
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* 知识总纲入口 */
+.bestiary__knowledge-entry {
+  margin-top: 32px; padding: 20px; text-align: center;
+  border: 1px solid var(--ink-pale); cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  background: rgba(245,240,232,0.4);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.bestiary__knowledge-entry:hover { border-color: var(--gold); box-shadow: 0 4px 16px rgba(201,168,76,0.1); }
+.bestiary__knowledge-icon { font-size: 1.5rem; }
+.bestiary__knowledge-text { font-family: var(--font-display); font-size: 1rem; letter-spacing: 0.1em; color: var(--ink-medium); transition: color 0.3s; }
+.bestiary__knowledge-entry:hover .bestiary__knowledge-text { color: var(--gold); }
 </style>

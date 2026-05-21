@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI荣耀闯关 · 项目数据图表</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+:root {
+  --blue: #2F5597;
+  --blue-dark: #1E3A6E;
+  --blue-light: #3E56A3;
+  --accent: #0070C0;
+  --bg: #F5F7FB;
+  --white: #FFFFFF;
+  --text: #333333;
+  --gray: #666666;
+  --light: #F2F2F2;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+.header {
+  background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+  color: white;
+  padding: 48px 60px 40px;
+  text-align: center;
+}
+.header h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
+.header p { font-size: 16px; opacity: .85; }
+.section {
+  max-width: 1100px;
+  margin: 40px auto;
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  overflow: hidden;
+}
+.section-header {
+  padding: 24px 40px 0;
+  border-left: 4px solid var(--blue);
+  margin-left: -1px;
+}
+.section-header h2 { font-size: 24px; color: var(--blue-dark); margin-bottom: 4px; }
+.section-header p { font-size: 14px; color: var(--gray); }
+.chart-wrap { width: 100%; height: 480px; }
+.kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 0 40px 32px; }
+.kpi-card { background: var(--bg); border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid var(--blue-light); }
+.kpi-card .nb { font-size: 40px; font-weight: 700; color: var(--blue); font-family: Arial,sans-serif; }
+.kpi-card .unit { font-size: 18px; color: var(--blue); }
+.kpi-card .label { font-size: 14px; color: var(--gray); margin-top: 4px; }
+.kpi-card .change { font-size: 13px; color: #2E7D32; margin-top: 4px; font-weight: 600; }
+.arch-wrap { padding: 32px 40px 40px; display: flex; flex-direction: column; gap: 0; }
+.arch-layer { border: 2px solid; border-radius: 10px; padding: 20px 24px; position: relative; margin-bottom: 28px; }
+.arch-layer .layer-tag { position: absolute; top: -14px; left: 24px; font-size: 13px; font-weight: 700; padding: 3px 14px; border-radius: 4px; color: white; }
+.arch-layer.frontend { border-color: var(--blue-light); }
+.arch-layer.frontend .layer-tag { background: var(--blue-light); }
+.arch-layer.service  { border-color: var(--accent); }
+.arch-layer.service .layer-tag { background: var(--accent); }
+.arch-layer.ai       { border-color: var(--blue-dark); }
+.arch-layer.ai .layer-tag { background: var(--blue-dark); }
+.arch-blocks { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+.arch-block { background: var(--bg); border-radius: 6px; padding: 12px 18px; min-width: 120px; text-align: center; border: 1px solid #e0e0e0; }
+.arch-block .b-title { font-size: 15px; font-weight: 700; color: var(--blue-dark); }
+.arch-block .b-desc  { font-size: 12px; color: var(--gray); margin-top: 2px; }
+.arch-arrow { text-align: center; font-size: 28px; color: var(--accent); margin: -12px 0 -8px; position: relative; z-index: 2; }
+.footer { text-align: center; padding: 24px; color: var(--gray); font-size: 12px; }
+@media print { .section { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; } body { background: white; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI 荣耀闯关 · 项目数据可视化</h1>
+  <p>游戏化 AI 可视化学习平台 &nbsp;|&nbsp; 职业院校 · 云计算+数字媒体专业 &nbsp;|&nbsp; 创 AI 案例征集</p>
+</div>
+
+<div class="section">
+  <div class="section-header"><h2>项目关键指标</h2><p>基于 120 名学生试点数据（2025-2026 学年第一学期）</p></div>
+  <div class="kpi-row">
+    <div class="kpi-card"><div><span class="nb">86</span><span class="unit">%</span></div><div class="label">知识掌握率</div><div class="change">↑ +28%（传统教学 58%）</div></div>
+    <div class="kpi-card"><div><span class="nb">4.7</span><span class="unit">/5</span></div><div class="label">学生兴趣评分</div><div class="change">↑ +47%（传统教学 3.2）</div></div>
+    <div class="kpi-card"><div><span class="nb">92</span><span class="unit">%</span></div><div class="label">课堂参与度</div><div class="change">↑ +104%（传统教学 45%）</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header"><h2>教学应用场景流程</h2><p>单次课 45 分钟 · 5 阶段闭环</p></div>
+  <div class="chart-wrap" id="chart-scenario"></div>
+</div>
+
+<div class="section">
+  <div class="section-header"><h2>教学效益对比分析</h2><p>传统教学 vs AI荣耀闯关 · 4 项核心指标</p></div>
+  <div class="chart-wrap" id="chart-benefit"></div>
+</div>
+
+<div class="section">
+  <div class="section-header"><h2>学生反馈数据</h2><p>120 名学生使用后匿名问卷 · 4 维度满意度评价</p></div>
+  <div class="chart-wrap" id="chart-feedback"></div>
+</div>
+
+<div class="section">
+  <div class="section-header"><h2>技术架构</h2><p>纯前端 SPA · 浏览器端 AI 推理 · 服务抽象层可切换后端</p></div>
+  <div class="arch-wrap">
+    <div class="arch-layer frontend"><span class="layer-tag">前端层</span>
+      <div class="arch-blocks">
+        <div class="arch-block"><div class="b-title">Vue 3 + Vite</div><div class="b-desc">SPA 框架 · 组件化</div></div>
+        <div class="arch-block"><div class="b-title">Canvas 2D</div><div class="b-desc">水墨粒子特效引擎</div></div>
+        <div class="arch-block"><div class="b-title">Three.js</div><div class="b-desc">3D 炼丹炉可视化</div></div>
+        <div class="arch-block"><div class="b-title">GSAP</div><div class="b-desc">卷轴展开 · 关卡转场</div></div>
+        <div class="arch-block"><div class="b-title">Vue Router</div><div class="b-desc">路由守卫 · 关卡控制</div></div>
+      </div>
+    </div>
+    <div class="arch-arrow">↓</div>
+    <div class="arch-layer service"><span class="layer-tag">服务层</span>
+      <div class="arch-blocks">
+        <div class="arch-block"><div class="b-title">Pinia</div><div class="b-desc">状态管理</div></div>
+        <div class="arch-block"><div class="b-title">authStore</div><div class="b-desc">注册 · 登录 · 会话</div></div>
+        <div class="arch-block"><div class="b-title">gameStore</div><div class="b-desc">关卡进度 · 勋章</div></div>
+        <div class="arch-block"><div class="b-title">authService</div><div class="b-desc">SHA-256 · localStorage</div></div>
+        <div class="arch-block"><div class="b-title">scoreService</div><div class="b-desc">成绩持久化</div></div>
+      </div>
+    </div>
+    <div class="arch-arrow">↓</div>
+    <div class="arch-layer ai"><span class="layer-tag">AI 推理层（浏览器端）</span>
+      <div class="arch-blocks">
+        <div class="arch-block"><div class="b-title">TensorFlow.js</div><div class="b-desc">浏览器端 ML 框架</div></div>
+        <div class="arch-block"><div class="b-title">MobileNet</div><div class="b-desc">图像分类 · 特征提取</div></div>
+        <div class="arch-block"><div class="b-title">Q-Learning</div><div class="b-desc">强化学习智能体</div></div>
+        <div class="arch-block"><div class="b-title">WebGL 加速</div><div class="b-desc">GPU 推理 · 零服务器</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">AI荣耀闯关 · 创AI案例征集 &nbsp;|&nbsp; github.com/akaipkun/ai-glory-quest</div>
+
+<script>
+const BLUE = '#2F5597', BLUE_L = '#3E56A3', ACCENT = '#0070C0';
+const BLUE_05 = 'rgba(47,85,151,0.5)';
+
+// ===== 1. 教学应用场景 =====
+(function(){
+  var dom = document.getElementById('chart-scenario');
+  var chart = echarts.init(dom);
+  var steps = [
+    { name:'① 教师导入', desc:'展示游戏IP背景\n激发好奇心', time:'5分钟' },
+    { name:'② 学生闯关', desc:'选择关卡交互学习\n水墨可视化', time:'20分钟' },
+    { name:'③ 实时反馈', desc:'Canvas实时绘制\n训练曲线+特征图', time:'持续' },
+    { name:'④ 通关奖励', desc:'获得勋章+学分\n成就系统激励', time:'5分钟' },
+    { name:'⑤ 教师评估', desc:'后台查看进度\n针对性指导', time:'课后' },
+  ];
+  var nodes=[], links=[];
+  var cx=120, cy=240, gap=210;
+  steps.forEach(function(s,i){
+    nodes.push({ name:s.name, x:cx+i*gap, y:cy, symbolSize:90,
+      itemStyle:{ color:{ type:'linear',x:0,y:0,x2:1,y2:1,
+        colorStops:i<2?[{offset:0,color:'#3E56A3'},{offset:1,color:'#2F5597'}]:i<4?[{offset:0,color:'#5B7FC7'},{offset:1,color:'#3E56A3'}]:[{offset:0,color:'#0070C0'},{offset:1,color:'#5B7FC7'}] } },
+      label:{ show:true, fontSize:14, fontWeight:'bold', color:BLUE, offset:[0,60], formatter:s.name+'\n'+s.time },
+      tooltip:{ formatter:s.name+' ('+s.time+')\n\n'+s.desc }
+    });
+  });
+  for(var i=0;i<steps.length-1;i++) links.push({ source:steps[i].name, target:steps[i+1].name,
+    lineStyle:{ color:ACCENT, width:2.5 },
+    label:{ show:true, formatter:'→', fontSize:22, color:ACCENT, fontWeight:'bold' } });
+  chart.setOption({ tooltip:{}, series:[{ type:'graph', layout:'none', roam:false, draggable:false,
+    edgeSymbol:['none','arrow'], edgeSymbolSize:10, data:nodes, links:links }] });
+  window.addEventListener('resize',function(){ chart.resize(); });
+})();
+
+// ===== 2. 教学效益对比 =====
+(function(){
+  var dom = document.getElementById('chart-benefit');
+  var chart = echarts.init(dom);
+  chart.setOption({
+    tooltip:{ trigger:'axis', axisPointer:{ type:'shadow' } },
+    legend:{ data:['传统教学','AI荣耀闯关'], top:10, textStyle:{ fontSize:13 } },
+    grid:{ left:120, right:60, top:60, bottom:40 },
+    xAxis:{ type:'value', max:function(v){ return v.max<5?5:100; }, axisLabel:{ fontSize:12 } },
+    yAxis:{ type:'category',
+      data:['学习兴趣\n(5分制)','知识掌握率\n(%)','课堂参与度\n(%)','课后自主练习\n(小时/周)'],
+      axisLabel:{ fontSize:12, color:BLUE, fontWeight:'bold', lineHeight:16 }
+    },
+    series:[
+      { name:'传统教学', type:'bar', data:[3.2,58,45,0.8], itemStyle:{ color:BLUE_05 }, barMaxWidth:32,
+        label:{ show:true, position:'right', fontSize:12, color:'#999' } },
+      { name:'AI荣耀闯关', type:'bar', data:[4.7,86,92,3.5],
+        itemStyle:{ color:{ type:'linear',x:0,y:0,x2:1,y2:0,
+          colorStops:[{offset:0,color:BLUE},{offset:1,color:ACCENT}] } }, barMaxWidth:32,
+        label:{ show:true, position:'right', fontSize:13, fontWeight:'bold', color:BLUE,
+          formatter:function(p){ return p.value + (p.dataIndex===0?'/5':p.dataIndex===3?'h':'%'); } }
+      }
+    ]
+  });
+  window.addEventListener('resize',function(){ chart.resize(); });
+})();
+
+// ===== 3. 学生反馈 =====
+(function(){
+  var dom = document.getElementById('chart-feedback');
+  var chart = echarts.init(dom);
+  chart.setOption({
+    tooltip:{},
+    legend:{ data:['AI荣耀闯关评分'], top:10, textStyle:{ fontSize:13 } },
+    radar:{ center:['35%','55%'], radius:'65%',
+      indicator:[
+        { name:'趣味性', max:5 }, { name:'知识易懂', max:5 },
+        { name:'互动体验', max:5 }, { name:'愿意推荐', max:5 }
+      ],
+      axisName:{ fontSize:14, fontWeight:'bold', color:BLUE }
+    },
+    series:[{ type:'radar', name:'AI荣耀闯关评分',
+      data:[{ value:[4.8,4.5,4.6,4.7], name:'评分',
+        areaStyle:{ color:'rgba(47,85,151,0.2)' },
+        lineStyle:{ color:BLUE, width:2 },
+        itemStyle:{ color:BLUE } }],
+      symbol:'circle', symbolSize:8
+    }],
+    graphic:[
+      { type:'text', left:'62%', top:'22%', style:{ text:'维度评分详情', fontSize:16, fontWeight:'bold', fill:BLUE } },
+      { type:'text', left:'62%', top:'30%', style:{ text:'趣味性', fontSize:13, fill:'#666' } },
+      { type:'rect', left:'72%', top:'30%', shape:{ width:140, height:10, r:5 }, style:{ fill:'#f0f0f0' } },
+      { type:'rect', left:'72%', top:'30%', shape:{ width:140*0.96, height:10, r:5 },
+        style:{ fill:{ type:'linear',x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:BLUE},{offset:1,color:ACCENT}]} } },
+      { type:'text', left:'92%', top:'29%', style:{ text:'4.8', fontSize:14, fontWeight:'bold', fill:BLUE } },
+      { type:'text', left:'62%', top:'40%', style:{ text:'知识易懂', fontSize:13, fill:'#666' } },
+      { type:'rect', left:'72%', top:'40%', shape:{ width:140, height:10, r:5 }, style:{ fill:'#f0f0f0' } },
+      { type:'rect', left:'72%', top:'40%', shape:{ width:140*0.90, height:10, r:5 },
+        style:{ fill:{ type:'linear',x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:BLUE},{offset:1,color:ACCENT}]} } },
+      { type:'text', left:'92%', top:'39%', style:{ text:'4.5', fontSize:14, fontWeight:'bold', fill:BLUE } },
+      { type:'text', left:'62%', top:'50%', style:{ text:'互动体验', fontSize:13, fill:'#666' } },
+      { type:'rect', left:'72%', top:'50%', shape:{ width:140, height:10, r:5 }, style:{ fill:'#f0f0f0' } },
+      { type:'rect', left:'72%', top:'50%', shape:{ width:140*0.92, height:10, r:5 },
+        style:{ fill:{ type:'linear',x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:BLUE},{offset:1,color:ACCENT}]} } },
+      { type:'text', left:'92%', top:'49%', style:{ text:'4.6', fontSize:14, fontWeight:'bold', fill:BLUE } },
+      { type:'text', left:'62%', top:'60%', style:{ text:'愿意推荐', fontSize:13, fill:'#666' } },
+      { type:'rect', left:'72%', top:'60%', shape:{ width:140, height:10, r:5 }, style:{ fill:'#f0f0f0' } },
+      { type:'rect', left:'72%', top:'60%', shape:{ width:140*0.94, height:10, r:5 },
+        style:{ fill:{ type:'linear',x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:BLUE},{offset:1,color:ACCENT}]} } },
+      { type:'text', left:'92%', top:'59%', style:{ text:'4.7', fontSize:14, fontWeight:'bold', fill:BLUE } },
+      { type:'text', left:'62%', top:'74%', style:{ text:'综合满意度', fontSize:16, fontWeight:'bold', fill:BLUE } },
+      { type:'text', left:'62%', top:'82%', style:{ text:'93%', fontSize:42, fontWeight:'bold', fill:ACCENT } },
+      { type:'text', left:'62%', top:'92%', style:{ text:'120名学生匿名问卷 · 2025秋季学期', fontSize:12, fill:'#999' } },
+    ]
+  });
+  window.addEventListener('resize',function(){ chart.resize(); });
+})();
+</script>
+</body>
+</html>

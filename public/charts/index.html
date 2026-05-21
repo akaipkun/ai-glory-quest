@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI荣耀闯关 · 数据图表风格选择</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Microsoft YaHei','Noto Sans SC',sans-serif;
+  background:#1a1a2e;
+  color:#e0e0e0;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+}
+.wrap{max-width:1000px;width:100%;padding:40px 20px;}
+h1{text-align:center;font-size:32px;margin-bottom:8px;color:#fff;letter-spacing:3px;}
+.sub{text-align:center;font-size:14px;color:#888;margin-bottom:40px;}
+.grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:20px;
+}
+@media(max-width:700px){.grid{grid-template-columns:1fr;}}
+.card{
+  position:relative;border-radius:12px;overflow:hidden;cursor:pointer;
+  transition:transform .25s,box-shadow .25s;
+  text-decoration:none;color:inherit;display:block;min-height:270px;
+}
+.card:hover{transform:translateY(-4px);}
+
+.card-clean{background:linear-gradient(135deg,#F5F7FB,#fff);border:1px solid #e8ecf1;color:#333;}
+.card-clean:hover{box-shadow:0 8px 30px rgba(47,85,151,.2);}
+.card-ink{background:linear-gradient(135deg,#F5F0E8,#EDE4D5);border:1px solid #d5c8b0;color:#1A1A1A;}
+.card-ink:hover{box-shadow:0 8px 30px rgba(26,26,26,.15);}
+.card-neon{background:linear-gradient(135deg,#0a0a1a,#12122a);border:1px solid rgba(0,255,255,.2);color:#0ff;}
+.card-neon:hover{box-shadow:0 8px 40px rgba(0,255,255,.2);}
+.card-swiss{background:linear-gradient(135deg,#fff,#fafafa);border:1px solid #ddd;color:#111;}
+.card-swiss:hover{box-shadow:0 8px 30px rgba(0,0,0,.15);}
+
+.card-inner{padding:28px 24px 20px;}
+.card-icon{font-size:48px;margin-bottom:12px;line-height:1;}
+.card-title{font-size:22px;font-weight:700;margin-bottom:6px;}
+.card-desc{font-size:13px;opacity:.7;line-height:1.6;}
+
+.preview-bars{display:flex;align-items:flex-end;gap:8px;height:70px;margin-top:16px;}
+.preview-bar{border-radius:3px;flex:1;}
+
+.card-clean .preview-bar{background:linear-gradient(180deg,#2F5597,#5B7FC7);}
+.card-ink .preview-bar{
+  background:linear-gradient(180deg,#1A1A1A,#6A6A6A);
+  clip-path:polygon(5% 100%,15% 15%,30% 20%,45% 5%,55% 12%,70% 25%,85% 8%,95% 18%,95% 100%);
+}
+.card-neon .preview-bar{
+  background:linear-gradient(180deg,#0ff,#06f);
+  box-shadow:0 0 12px rgba(0,255,255,.5);border-radius:2px;
+}
+.card-swiss .preview-bar{background:#e2001a;border-radius:0;margin-left:1px;}
+
+.badge{position:absolute;top:12px;right:14px;font-size:10px;padding:4px 10px;border-radius:20px;font-weight:600;letter-spacing:1px;}
+.card-clean .badge{background:#2F5597;color:#fff;}
+.card-ink .badge{background:#C23A2B;color:#fff;}
+.card-neon .badge{background:transparent;color:#0ff;border:1px solid #0ff55;}
+.card-swiss .badge{background:#111;color:#fff;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>AI 荣耀闯关 · 数据图表</h1>
+<p class="sub">4 种视觉风格 · 点击预览完整图表</p>
+<div class="grid">
+<a class="card card-clean" href="clean/"><span class="badge">经典</span>
+  <div class="card-inner"><div class="card-icon">&#x1F4CA;</div>
+    <div class="card-title">白色经典</div>
+    <div class="card-desc">ECharts 标准图表 · 蓝白配色 · 专业稳重 · 适合正式申报文档</div>
+    <div class="preview-bars"><div class="preview-bar" style="height:40%"></div><div class="preview-bar" style="height:65%"></div><div class="preview-bar" style="height:85%"></div><div class="preview-bar" style="height:55%"></div><div class="preview-bar" style="height:95%"></div><div class="preview-bar" style="height:70%"></div></div>
+  </div>
+</a>
+<a class="card card-ink" href="xkcd/"><span class="badge">手绘</span>
+  <div class="card-inner"><div class="card-icon">&#x270F;</div>
+    <div class="card-title">XKCD 手绘</div>
+    <div class="card-desc">chart.xkcd · Rough.js 手绘线条 · 漫画风幽默 · 宣纸背景 · 不羁数据</div>
+    <div class="preview-bars"><div class="preview-bar" style="height:35%"></div><div class="preview-bar" style="height:60%"></div><div class="preview-bar" style="height:80%"></div><div class="preview-bar" style="height:50%"></div><div class="preview-bar" style="height:90%"></div><div class="preview-bar" style="height:65%"></div></div>
+  </div>
+</a>
+<a class="card card-neon" href="neon/"><span class="badge">赛博</span>
+  <div class="card-inner"><div class="card-icon">&#x26A1;</div>
+    <div class="card-title">暗黑霓虹</div>
+    <div class="card-desc">Chart.js · 霓虹渐变动画 · Canvas 2D 渲染 · 赛博朋克美学 · 弹性动效</div>
+    <div class="preview-bars"><div class="preview-bar" style="height:42%"></div><div class="preview-bar" style="height:68%"></div><div class="preview-bar" style="height:88%"></div><div class="preview-bar" style="height:52%"></div><div class="preview-bar" style="height:96%"></div><div class="preview-bar" style="height:72%"></div></div>
+  </div>
+</a>
+<a class="card card-swiss" href="swiss/"><span class="badge">瑞士</span>
+  <div class="card-inner"><div class="card-icon">&#x25A3;</div>
+    <div class="card-title">瑞士极简</div>
+    <div class="card-desc">D3.js 精确制图 · 红黑白 Helvetica · 数据-墨水比 · 像素级网格对齐</div>
+    <div class="preview-bars"><div class="preview-bar" style="height:38%"></div><div class="preview-bar" style="height:62%"></div><div class="preview-bar" style="height:82%"></div><div class="preview-bar" style="height:48%"></div><div class="preview-bar" style="height:92%"></div><div class="preview-bar" style="height:68%"></div></div>
+  </div>
+</a>
+</div></div>
+</body>
+</html>

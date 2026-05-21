@@ -1,5 +1,16 @@
 <template>
   <div class="timeline">
+    <!-- AI 原理浮窗 -->
+    <AiPrincipleTip
+      :show="showPrincipleTip"
+      title="AI千年史 · 水墨卷轴"
+      subtitle="从图灵到GPT——人工智能的进化之路"
+      :principle="'人工智能的发展经历了三次浪潮：第一次（1950s-1970s）以符号主义和逻辑推理为主，诞生了专家系统；第二次（1980s-1990s）连接主义兴起，神经网络开始崭露头角；第三次（2010s至今）深度学习爆发——大数据+GPU算力+更好的算法让AI在图像识别、自然语言处理等领域超越人类。每一次浪潮都伴随着技术突破和期望泡沫，但AI始终在曲折中前进。'"
+      :gameMapping="'卷轴上的每个墨点代表AI史上的里程碑事件。从1950年图灵提出「机器能思考吗「，到2023年大语言模型改变世界——这70多年的历史，Python和机器学习框架让每个人都能参与AI开发。拖动卷轴，穿越时空，触摸每一个改变历史的瞬间。'"
+      :tips="['AI并非一夜之间诞生——它经历了70多年的积累和三次浪潮的洗礼', '数据、算法、算力是AI发展的三大驱动力——三者缺一不可', '每个里程碑都建立在无数前人工作的基础之上——科学是累积的', '点击卡片中的「📖 了解更多「可以查看Wikipedia原文']"
+      vizType="default"
+      @close="showPrincipleTip = false"
+    />
     <canvas ref="canvasRef" class="timeline__canvas"></canvas>
     <div class="timeline__container">
       <!-- 卷轴标题 -->
@@ -38,6 +49,7 @@
                 <div class="timeline__card-icon">{{ event.icon }}</div>
                 <h3 class="timeline__card-title">{{ event.title }}</h3>
                 <p class="timeline__card-desc body-text">{{ event.description }}</p>
+                <a v-if="event.wiki" :href="event.wiki" target="_blank" class="timeline__card-wiki">📖 了解更多 →</a>
               </div>
             </transition>
           </div>
@@ -61,9 +73,11 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import AiPrincipleTip from '../ink/AiPrincipleTip.vue'
 
 const emit = defineEmits(['complete'])
 
+const showPrincipleTip = ref(true)
 const canvasRef = ref(null)
 const lineCanvas = ref(null)
 const scrollRef = ref(null)
@@ -76,17 +90,23 @@ let animId = null
 
 const events = [
   { year: '1950', icon: '🧠', title: '图灵测试', x: 80,
-    description: '艾伦·图灵提出"机器能思考吗？"，开创人工智能先河。图灵测试至今仍是衡量AI的重要标准。' },
+    description: '艾伦·图灵提出"机器能思考吗？"，开创人工智能先河。图灵测试至今仍是衡量AI的重要标准。',
+    wiki: 'https://en.wikipedia.org/wiki/Turing_test' },
   { year: '1956', icon: '🏛️', title: '达特茅斯会议', x: 260,
-    description: '麦卡锡、明斯基等科学家首次提出"人工智能"术语，AI作为独立学科正式诞生。' },
+    description: '麦卡锡、明斯基等科学家首次提出"人工智能"术语，AI作为独立学科正式诞生。',
+    wiki: 'https://en.wikipedia.org/wiki/Dartmouth_workshop' },
   { year: '1997', icon: '♟️', title: '深蓝击败卡斯帕罗夫', x: 440,
-    description: 'IBM的深蓝计算机击败国际象棋世界冠军，AI在特定领域首次超越人类顶级水平。' },
+    description: 'IBM的深蓝计算机击败国际象棋世界冠军，AI在特定领域首次超越人类顶级水平。',
+    wiki: 'https://en.wikipedia.org/wiki/Deep_Blue_(chess_computer)' },
   { year: '2012', icon: '🧠', title: 'AlexNet深度学习革命', x: 620,
-    description: 'AlexNet在ImageNet竞赛中大幅领先，深度学习时代到来，计算机视觉取得突破性进展。' },
+    description: 'AlexNet在ImageNet竞赛中大幅领先，深度学习时代到来，计算机视觉取得突破性进展。',
+    wiki: 'https://en.wikipedia.org/wiki/AlexNet' },
   { year: '2023', icon: '🤖', title: '大语言模型时代', x: 800,
-    description: 'GPT-4、Claude等大语言模型展现出惊人的对话、推理和创作能力，生成式AI引爆全球。' },
+    description: 'GPT-4、Claude等大语言模型展现出惊人的对话、推理和创作能力，生成式AI引爆全球。',
+    wiki: 'https://en.wikipedia.org/wiki/Large_language_model' },
   { year: 'NOW', icon: '🎮', title: '你的闯关开始', x: 980,
-    description: '站在AI浪潮之巅，从今天开始，掌握这门改变世界的力量。点击下方按钮，继续你的闯关之旅！' }
+    description: '站在AI浪潮之巅，从今天开始，掌握这门改变世界的力量。点击下方按钮，继续你的闯关之旅！',
+    wiki: null }
 ]
 
 function selectEvent(i) {
@@ -310,6 +330,25 @@ onUnmounted(() => {
   font-size: 0.78rem;
   line-height: 1.7;
   color: var(--ink-medium);
+}
+
+.timeline__card-wiki {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 0.72rem;
+  color: var(--cinnabar);
+  text-decoration: none;
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  padding: 3px 10px;
+  border: 1px solid var(--ink-pale);
+  transition: all 0.3s ease;
+}
+
+.timeline__card-wiki:hover {
+  border-color: var(--cinnabar);
+  background: rgba(194, 58, 43, 0.04);
+  color: var(--ink-black);
 }
 
 /* 连接线 */

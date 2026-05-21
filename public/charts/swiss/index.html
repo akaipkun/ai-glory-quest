@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瑞士极简 · AI荣耀闯关</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Inter','Helvetica Neue','Microsoft YaHei',sans-serif;
+  background:#fff;color:#111;line-height:1.5;
+}
+.header{
+  padding:52px 60px 44px;text-align:left;
+  border-bottom:2px solid #111;
+}
+.header h1{font-size:34px;font-weight:700;color:#111;letter-spacing:-.5px;}
+.header .sub{font-size:14px;color:#666;margin-top:4px;}
+.header .accent{color:#e2001a;}
+
+.section{max-width:1100px;margin:40px auto;border-bottom:1px solid #eee;padding-bottom:32px;}
+.section:last-child{border-bottom:none;}
+.section-header{padding:0 40px;display:flex;align-items:baseline;gap:16px;margin-bottom:8px;}
+.section-header h2{font-size:20px;font-weight:700;color:#111;letter-spacing:-.3px;}
+.section-header .num{font-size:11px;font-weight:600;color:#e2001a;letter-spacing:1px;}
+.section-header p{font-size:12px;color:#999;}
+
+.chart-svg{display:block;width:100%;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:16px 40px 24px;}
+.kpi-card{text-align:left;padding:20px 24px;border-left:2px solid #eee;}
+.kpi-card:first-child{border-left-color:#e2001a;}
+.kpi-card .nb{font-size:56px;font-weight:200;color:#111;font-family:'Helvetica Neue',sans-serif;line-height:1;}
+.kpi-card .unit{font-size:18px;color:#666;font-weight:300;}
+.kpi-card .label{font-size:12px;color:#999;margin-top:8px;text-transform:uppercase;letter-spacing:1px;font-weight:600;}
+.kpi-card .change{font-size:11px;color:#e2001a;margin-top:2px;font-weight:600;}
+
+.arch-wrap{padding:8px 40px 24px;}
+.arch-layer{margin-bottom:20px;position:relative;}
+.arch-layer .layer-tag{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;padding:4px 0;margin-bottom:8px;border-bottom:2px solid #111;}
+.arch-layer.service .layer-tag{border-bottom-color:#555;}
+.arch-layer.ai .layer-tag{border-bottom-color:#e2001a;}
+.arch-blocks{display:flex;gap:24px;flex-wrap:wrap;}
+.arch-block{min-width:100px;}
+.arch-block .b-title{font-size:14px;font-weight:700;color:#111;}
+.arch-block .b-desc{font-size:11px;color:#999;margin-top:2px;}
+.arch-arrow{font-size:18px;color:#ccc;margin:8px 0 8px 4px;}
+
+.footer{text-align:left;padding:20px 40px 32px;color:#ccc;font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>AI 荣耀闯关 <span class="accent">·</span> 数据可视化</h1>
+  <div class="sub">游戏化 AI 可视化学习平台 &nbsp;—&nbsp; 职业院校 · 云计算+数字媒体专业</div>
+</div>
+
+<div class="section"><div class="section-header"><span class="num">01</span><h2>项目关键指标</h2><p>120 名学生试点数据 · 2025–2026 第一学期</p></div>
+<div class="kpi-row">
+<div class="kpi-card"><div><span class="nb">86</span><span class="unit">%</span></div><div class="label">知识掌握率</div><div class="change">+28% vs 传统</div></div>
+<div class="kpi-card"><div><span class="nb">4.7</span><span class="unit">/5</span></div><div class="label">学生兴趣评分</div><div class="change">+47% vs 传统</div></div>
+<div class="kpi-card"><div><span class="nb">92</span><span class="unit">%</span></div><div class="label">课堂参与度</div><div class="change">+104% vs 传统</div></div>
+</div></div>
+
+<div class="section"><div class="section-header"><span class="num">02</span><h2>教学应用场景流程</h2><p>单次课 45 分钟 · 5 阶段闭环</p></div>
+<div class="chart-svg" id="d3-flow"></div></div>
+
+<div class="section"><div class="section-header"><span class="num">03</span><h2>教学效益对比分析</h2><p>传统教学 vs AI荣耀闯关 · 4 项核心指标</p></div>
+<div class="chart-svg" id="d3-bars"></div></div>
+
+<div class="section"><div class="section-header"><span class="num">04</span><h2>学生反馈数据</h2><p>120 名学生使用后匿名问卷 · 综合满意度 93%</p></div>
+<div class="chart-svg" id="d3-radar"></div></div>
+
+<div class="section"><div class="section-header"><span class="num">05</span><h2>技术架构</h2><p>纯前端 SPA · 浏览器端 AI 推理 · 服务抽象层</p></div>
+<div class="arch-wrap">
+<div class="arch-layer"><span class="layer-tag">前端层</span><div class="arch-blocks">
+<div class="arch-block"><div class="b-title">Vue 3 + Vite</div><div class="b-desc">SPA 框架 · 组件化</div></div>
+<div class="arch-block"><div class="b-title">Canvas 2D</div><div class="b-desc">水墨粒子特效引擎</div></div>
+<div class="arch-block"><div class="b-title">Three.js</div><div class="b-desc">3D 炼丹炉可视化</div></div>
+<div class="arch-block"><div class="b-title">GSAP</div><div class="b-desc">卷轴展开 · 关卡转场</div></div>
+</div></div>
+<div class="arch-arrow">↓</div>
+<div class="arch-layer service"><span class="layer-tag">服务层</span><div class="arch-blocks">
+<div class="arch-block"><div class="b-title">Pinia</div><div class="b-desc">状态管理</div></div>
+<div class="arch-block"><div class="b-title">authService</div><div class="b-desc">SHA-256 · localStorage</div></div>
+<div class="arch-block"><div class="b-title">scoreService</div><div class="b-desc">成绩持久化</div></div>
+</div></div>
+<div class="arch-arrow">↓</div>
+<div class="arch-layer ai"><span class="layer-tag">AI 推理层</span><div class="arch-blocks">
+<div class="arch-block"><div class="b-title">TensorFlow.js</div><div class="b-desc">浏览器端 ML 框架</div></div>
+<div class="arch-block"><div class="b-title">MobileNet</div><div class="b-desc">图像分类 · 特征提取</div></div>
+<div class="arch-block"><div class="b-title">Q-Learning</div><div class="b-desc">强化学习智能体</div></div>
+</div></div></div></div>
+
+<div class="footer">AI GLORY QUEST · DATA VISUALIZATION · SWISS STYLE · D3.JS</div>
+
+<script>
+d3.select(window).on('resize', function() {
+  // Charts render at fixed sizes to maintain Swiss precision
+});
+
+(function(){
+  // =========================================================
+  // Chart 1: Scenario Flow — D3 Graph
+  // =========================================================
+  var container = document.getElementById('d3-flow');
+  var W = container.clientWidth || 960;
+  var H = 300;
+  var svg = d3.select('#d3-flow')
+    .append('svg')
+    .attr('viewBox', '0 0 ' + W + ' ' + H)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  var steps = [
+    { n: '教师导入',  t: '5 min',    d: '展示IP背景 · 激发好奇心' },
+    { n: '学生闯关',  t: '20 min',   d: '水墨可视化 · 交互学习' },
+    { n: '实时反馈',  t: '持续',     d: '训练曲线 · 特征热力图' },
+    { n: '通关奖励',  t: '5 min',    d: '勋章+学分 · 成就激励' },
+    { n: '教师评估',  t: '课后',     d: '后台进度 · 针对性指导' }
+  ];
+
+  var nodeW = 130, nodeH = 56;
+  var totalNodesW = steps.length * nodeW;
+  var gap = (W - 80 - totalNodesW) / (steps.length - 1);
+  var y = H / 2;
+
+  // Connecting lines (precise, straight)
+  for (var i = 0; i < steps.length - 1; i++) {
+    var x1 = 40 + i * (nodeW + gap) + nodeW;
+    var x2 = 40 + (i + 1) * (nodeW + gap);
+    svg.append('line')
+      .attr('x1', x1).attr('y1', y)
+      .attr('x2', x2).attr('y2', y)
+      .attr('stroke', '#ddd')
+      .attr('stroke-width', 1.5);
+    // Arrow tip
+    svg.append('polygon')
+      .attr('points', (x2-6)+','+(y-4)+' '+x2+','+y+' '+(x2-6)+','+(y+4))
+      .attr('fill', '#e2001a');
+  }
+
+  // Nodes
+  var nodes = svg.selectAll('g.node')
+    .data(steps)
+    .enter().append('g')
+    .attr('transform', function(d, i) {
+      return 'translate(' + (40 + i * (nodeW + gap)) + ',' + (y - nodeH/2) + ')';
+    });
+
+  // Node background
+  nodes.append('rect')
+    .attr('width', nodeW).attr('height', nodeH)
+    .attr('fill', '#fff')
+    .attr('stroke', '#111')
+    .attr('stroke-width', 1.5);
+
+  // Index number (red, top-left)
+  nodes.append('text')
+    .attr('x', 8).attr('y', 16)
+    .attr('font-size', 9).attr('font-weight', 700)
+    .attr('fill', '#e2001a')
+    .text(function(d, i) { return '0' + (i + 1); });
+
+  // Name
+  nodes.append('text')
+    .attr('x', nodeW/2).attr('y', 28)
+    .attr('text-anchor', 'middle')
+    .attr('font-size', 13).attr('font-weight', 700)
+    .attr('fill', '#111')
+    .text(function(d) { return d.n; });
+
+  // Time (bottom-left)
+  nodes.append('text')
+    .attr('x', 32).attr('y', 46)
+    .attr('font-size', 10).attr('font-weight', 600)
+    .attr('fill', '#999')
+    .text(function(d) { return d.t; });
+
+  // Description below node
+  nodes.append('text')
+    .attr('x', nodeW/2).attr('y', nodeH + 28)
+    .attr('text-anchor', 'middle')
+    .attr('font-size', 10)
+    .attr('fill', '#999')
+    .text(function(d) { return d.d; });
+
+  // Title
+  svg.append('text')
+    .attr('x', 40).attr('y', 24)
+    .attr('font-size', 13).attr('font-weight', 700)
+    .attr('fill', '#111')
+    .text('课堂 45 分钟 · 五阶段教学闭环');
+
+  // =========================================================
+  // Chart 2: Benefit Comparison — D3 Horizontal Bar
+  // =========================================================
+  var container2 = document.getElementById('d3-bars');
+  var W2 = container2.clientWidth || 960;
+  var H2 = 430;
+  var svg2 = d3.select('#d3-bars')
+    .append('svg')
+    .attr('viewBox', '0 0 ' + W2 + ' ' + H2)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  var margin2 = { top: 50, right: 100, bottom: 40, left: 160 };
+  var innerW = W2 - margin2.left - margin2.right;
+  var innerH = H2 - margin2.top - margin2.bottom;
+
+  var labels = ['学习兴趣 (5分制)', '知识掌握率 (%)', '课堂参与度 (%)', '课后练习 (h/周)'];
+  var trad   = [3.2, 58, 45, 0.8];
+  var ai     = [4.7, 86, 92, 3.5];
+
+  var yScale = d3.scaleBand().domain(labels).range([0, innerH]).padding(0.4);
+  var xMax = 100;
+
+  var g2 = svg2.append('g').attr('transform', 'translate(' + margin2.left + ',' + margin2.top + ')');
+
+  // Title
+  svg2.append('text')
+    .attr('x', margin2.left).attr('y', 24)
+    .attr('font-size', 13).attr('font-weight', 700)
+    .attr('fill', '#111')
+    .text('传统教学 vs AI荣耀闯关 · 教学效益对比分析');
+
+  // Y axis labels
+  g2.selectAll('text.ylabel')
+    .data(labels)
+    .enter().append('text')
+    .attr('x', -12).attr('y', function(d) { return yScale(d) + yScale.bandwidth()/2 + 4; })
+    .attr('text-anchor', 'end')
+    .attr('font-size', 12).attr('font-weight', 600)
+    .attr('fill', '#111')
+    .text(function(d) { return d; });
+
+  // Grid lines
+  g2.selectAll('line.grid')
+    .data(d3.range(0, 101, 25))
+    .enter().append('line')
+    .attr('x1', function(d) { return d/100 * innerW; })
+    .attr('y1', -8)
+    .attr('x2', function(d) { return d/100 * innerW; })
+    .attr('y2', innerH)
+    .attr('stroke', '#eee')
+    .attr('stroke-width', 0.5);
+
+  // Traditional bars (light gray)
+  g2.selectAll('rect.trad')
+    .data(trad)
+    .enter().append('rect')
+    .attr('x', 0)
+    .attr('y', function(d, i) { return yScale(labels[i]) + yScale.bandwidth() * 0.1; })
+    .attr('width', function(d, i) {
+      return (d / (i === 0 || i === 3 ? 5 : xMax)) * innerW;
+    })
+    .attr('height', yScale.bandwidth() * 0.3)
+    .attr('fill', '#ddd');
+
+  // AI bars (black)
+  g2.selectAll('rect.ai')
+    .data(ai)
+    .enter().append('rect')
+    .attr('x', 0)
+    .attr('y', function(d, i) { return yScale(labels[i]) + yScale.bandwidth() * 0.55; })
+    .attr('width', function(d, i) {
+      return (d / (i === 0 || i === 3 ? 5 : xMax)) * innerW;
+    })
+    .attr('height', yScale.bandwidth() * 0.3)
+    .attr('fill', '#111');
+
+  // AI value labels
+  g2.selectAll('text.aival')
+    .data(ai)
+    .enter().append('text')
+    .attr('x', function(d, i) {
+      return (d / (i === 0 || i === 3 ? 5 : xMax)) * innerW + 8;
+    })
+    .attr('y', function(d, i) { return yScale(labels[i]) + yScale.bandwidth() * 0.55 + yScale.bandwidth() * 0.15 + 10; })
+    .attr('font-size', 13).attr('font-weight', 700)
+    .attr('fill', '#e2001a')
+    .text(function(d, i) { return d + (i === 0 ? '/5' : i === 3 ? 'h' : '%'); });
+
+  // Trad value labels
+  g2.selectAll('text.tradval')
+    .data(trad)
+    .enter().append('text')
+    .attr('x', function(d, i) {
+      return (d / (i === 0 || i === 3 ? 5 : xMax)) * innerW + 8;
+    })
+    .attr('y', function(d, i) { return yScale(labels[i]) + 16; })
+    .attr('font-size', 11)
+    .attr('fill', '#999')
+    .text(function(d, i) { return d + (i === 0 ? '/5' : i === 3 ? 'h' : '%'); });
+
+  // Legend
+  svg2.append('rect').attr('x', margin2.left).attr('y', H2 - 28).attr('width', 32).attr('height', 8).attr('fill', '#ddd');
+  svg2.append('text').attr('x', margin2.left + 40).attr('y', H2 - 16).attr('font-size', 11).attr('fill', '#999').text('传统教学');
+  svg2.append('rect').attr('x', margin2.left + 110).attr('y', H2 - 28).attr('width', 32).attr('height', 8).attr('fill', '#111');
+  svg2.append('text').attr('x', margin2.left + 150).attr('y', H2 - 16).attr('font-size', 11).attr('fill', '#999').text('AI荣耀闯关');
+
+  // =========================================================
+  // Chart 3: Student Feedback — D3 Custom Radar + Bars
+  // =========================================================
+  var container3 = document.getElementById('d3-radar');
+  var W3 = container3.clientWidth || 960;
+  var H3 = 480;
+  var svg3 = d3.select('#d3-radar')
+    .append('svg')
+    .attr('viewBox', '0 0 ' + W3 + ' ' + H3)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  var cx = W3 * 0.32, cy = H3 * 0.48, maxR = Math.min(W3 * 0.24, H3 * 0.38);
+  var indicators = [
+    { name: '趣味性',   angle: -90, value: 4.8 },
+    { name: '知识易懂', angle: 0,   value: 4.5 },
+    { name: '互动体验', angle: 90,  value: 4.6 },
+    { name: '愿意推荐', angle: 180, value: 4.7 }
+  ];
+
+  // Title
+  svg3.append('text')
+    .attr('x', 40).attr('y', 24)
+    .attr('font-size', 13).attr('font-weight', 700)
+    .attr('fill', '#111')
+    .text('120 名学生匿名问卷 · 4 维度满意度评价');
+
+  // Concentric grid rings (5 levels)
+  for (var ring = 1; ring <= 5; ring++) {
+    var rr = maxR * ring / 5;
+    svg3.append('circle')
+      .attr('cx', cx).attr('cy', cy).attr('r', rr)
+      .attr('fill', 'none')
+      .attr('stroke', ring === 5 ? '#111' : '#eee')
+      .attr('stroke-width', ring === 5 ? 1 : 0.5);
+  }
+
+  // Axes
+  indicators.forEach(function(ind) {
+    var rad = ind.angle * Math.PI / 180;
+    var ex = cx + Math.cos(rad) * maxR;
+    var ey = cy + Math.sin(rad) * maxR;
+    svg3.append('line')
+      .attr('x1', cx).attr('y1', cy)
+      .attr('x2', ex).attr('y2', ey)
+      .attr('stroke', '#ddd')
+      .attr('stroke-width', 0.5);
+    // Label
+    var lx = cx + Math.cos(rad) * (maxR + 30);
+    var ly = cy + Math.sin(rad) * (maxR + 30);
+    svg3.append('text')
+      .attr('x', lx).attr('y', ly)
+      .attr('text-anchor', 'middle').attr('dominant-baseline', 'middle')
+      .attr('font-size', 13).attr('font-weight', 600)
+      .attr('fill', '#111')
+      .text(ind.name);
+  });
+
+  // Data polygon
+  var points = indicators.map(function(ind) {
+    var rad = (ind.angle - 90) * Math.PI / 180;
+    return [cx + Math.cos(rad) * maxR * ind.value / 5,
+            cy + Math.sin(rad) * maxR * ind.value / 5];
+  });
+
+  svg3.append('polygon')
+    .attr('points', points.map(function(p) { return p.join(','); }).join(' '))
+    .attr('fill', 'rgba(0,0,0,0.05)')
+    .attr('stroke', '#111')
+    .attr('stroke-width', 2);
+
+  // Data points
+  points.forEach(function(p) {
+    svg3.append('circle')
+      .attr('cx', p[0]).attr('cy', p[1]).attr('r', 4)
+      .attr('fill', '#e2001a');
+  });
+
+  // Right side: score bars
+  var rx = W3 * 0.58, ry = H3 * 0.22, barH = 24, barGap = 42;
+  svg3.append('text')
+    .attr('x', rx).attr('y', ry - 10)
+    .attr('font-size', 13).attr('font-weight', 700)
+    .attr('fill', '#111')
+    .text('维度评分详情');
+
+  indicators.forEach(function(ind, i) {
+    var by = ry + 16 + i * barGap;
+    var barMaxW = W3 - rx - 60;
+    var barW = barMaxW * ind.value / 5;
+
+    // Label
+    svg3.append('text')
+      .attr('x', rx).attr('y', by + 10)
+      .attr('font-size', 11)
+      .attr('fill', '#999')
+      .text(ind.name);
+
+    // Background bar
+    svg3.append('rect')
+      .attr('x', rx + 72).attr('y', by).attr('width', barMaxW).attr('height', barH)
+      .attr('fill', '#f5f5f5');
+
+    // Value bar
+    svg3.append('rect')
+      .attr('x', rx + 72).attr('y', by).attr('width', barW).attr('height', barH)
+      .attr('fill', '#111');
+
+    // Value
+    svg3.append('text')
+      .attr('x', rx + 72 + barW + 10).attr('y', by + barH/2 + 4)
+      .attr('font-size', 15).attr('font-weight', 700)
+      .attr('fill', '#e2001a')
+      .text(ind.value.toFixed(1));
+  });
+
+  // Summary
+  var sy = ry + 16 + 4 * barGap + 24;
+  svg3.append('text')
+    .attr('x', rx).attr('y', sy)
+    .attr('font-size', 13).attr('font-weight', 700)
+    .attr('fill', '#111')
+    .text('综合满意度');
+
+  svg3.append('text')
+    .attr('x', rx).attr('y', sy + 44)
+    .attr('font-size', 52).attr('font-weight', 200)
+    .attr('fill', '#e2001a')
+    .text('93%');
+
+  svg3.append('text')
+    .attr('x', rx).attr('y', sy + 68)
+    .attr('font-size', 10)
+    .attr('fill', '#999')
+    .text('120 名学生 · 2025 秋');
+
+})();
+</script>
+</body>
+</html>

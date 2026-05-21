@@ -2,6 +2,20 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { scoreService } from '../services/scoreService'
 
+// 隐藏成就（跨关卡小成就）定义
+const MINI_BADGE_DEFS = [
+  { id: 'all_wiki', name: '博览群书', icon: '📚', hint: '点击过 5+ 个 wiki 外部链接' },
+  { id: 'perfect_turing', name: '火眼金睛', icon: '👁️', hint: '图灵测试 3/3 全对' },
+  { id: 'perfect_detect', name: '明察秋毫', icon: '🔍', hint: 'AI 生成检测 8/8 全对' },
+  { id: 'perfect_alchemy', name: '炼丹宗师', icon: '🧪', hint: '炼丹炉得分 ≥ 90' },
+  { id: 'speed_demon', name: '速通达人', icon: '⚡', hint: '任一关卡 30 秒内完成' },
+  { id: 'all_steps', name: '步步为营', icon: '👣', hint: '集齐全部 18 个子步骤成就' },
+  { id: 'three_stars', name: '三星连珠', icon: '⭐', hint: '连续 3 关 score ≥ 85' },
+  { id: 'king_of_kings', name: '最强王者', icon: '👑', hint: '王者决战 score ≥ 92' },
+  { id: 'five_wins', name: '百战不殆', icon: '🏆', hint: '5v5 团战 5 局全胜' },
+  { id: 'knowledge_seeker', name: '求知若渴', icon: '📖', hint: '访问 AI 知识总纲页' }
+]
+
 // 子步骤成就定义：每个关卡 3 步，每步一个小成就
 const STEP_BADGES = {
   1: [
@@ -48,14 +62,16 @@ export const useGameStore = defineStore('game', () => {
     { id: 6, name: '团战时刻', icon: '💥', unlocked: false, completed: false, score: 0 }
   ])
 
-  // --- 成就系统：关卡徽章 + 子步骤徽章 ---
+  // --- 成就系统：关卡徽章 + 子步骤徽章 + 隐藏成就 ---
   const badges = ref([])        // 关卡通关徽章 [{ levelId, name, icon, earnedAt }]
   const stepBadges = ref([])    // 子步骤徽章 [{ levelId, stepIndex, name, icon, desc, earnedAt }]
+  const miniBadges = ref([])    // 隐藏成就 [{ id, name, icon, earnedAt }]
 
   // 当前用户ID（由 authStore 设置）
   let _userId = null
   // godMode 持久化标记
   let _godModeUnlocked = false
+  let _consecutiveHigh = 0  // 连续高分计数（用于三星连珠）
 
   const totalCredits = computed(() => {
     const creditMap = { 1: 1, 2: 1, 3: 2, 4: 2, 5: 2, 6: 2 }
@@ -64,8 +80,10 @@ export const useGameStore = defineStore('game', () => {
     badges.value.forEach(b => {
       credits += creditMap[b.levelId] || 0
     })
-    // 子步骤学分（每步 0.5，凑整）
+    // 子步骤学分（每步 0.5）
     credits += stepBadges.value.length * 0.5
+    // 隐藏成就学分（每个 0.5）
+    credits += miniBadges.value.length * 0.5
     if (badges.value.length === 6) credits += 3 // 集齐奖励
     return Math.floor(credits)
   })
@@ -108,6 +126,9 @@ export const useGameStore = defineStore('game', () => {
     if (data.stepBadges) {
       stepBadges.value = data.stepBadges
     }
+    if (data.miniBadges) {
+      miniBadges.value = data.miniBadges
+    }
     if (data.godModeUnlocked) {
       _godModeUnlocked = data.godModeUnlocked
     }
@@ -123,6 +144,7 @@ export const useGameStore = defineStore('game', () => {
       levels: JSON.parse(JSON.stringify(levels.value)),
       badges: JSON.parse(JSON.stringify(badges.value)),
       stepBadges: JSON.parse(JSON.stringify(stepBadges.value)),
+      miniBadges: JSON.parse(JSON.stringify(miniBadges.value)),
       godModeUnlocked: _godModeUnlocked
     }
     await scoreService.saveScores(_userId, data)
@@ -152,6 +174,16 @@ export const useGameStore = defineStore('game', () => {
       nextLevel.unlocked = true
     }
 
+    // 三星连珠检测
+    if (score >= 85) {
+      _consecutiveHigh++
+      if (_consecutiveHigh >= 3) {
+        earnMiniBadge('three_stars')
+      }
+    } else {
+      _consecutiveHigh = 0
+    }
+
     saveUserData()
   }
 
@@ -174,6 +206,10 @@ export const useGameStore = defineStore('game', () => {
       desc: def.desc,
       earnedAt: new Date().toISOString()
     })
+    // 检查是否集齐全部 18 步子步骤成就
+    if (stepBadges.value.length >= 18) {
+      earnMiniBadge('all_steps')
+    }
     saveUserData()
     return true
   }
@@ -181,6 +217,33 @@ export const useGameStore = defineStore('game', () => {
   // 检查某步是否已获得成就
   function hasStepBadge(levelId, stepIndex) {
     return stepBadges.value.some(b => b.levelId === levelId && b.stepIndex === stepIndex)
+  }
+
+  // 隐藏成就
+  function earnMiniBadge(id) {
+    if (miniBadges.value.find(b => b.id === id)) return false
+    const def = MINI_BADGE_DEFS.find(d => d.id === id)
+    if (!def) return false
+    miniBadges.value.push({
+      id: def.id,
+      name: def.name,
+      icon: def.icon,
+      earnedAt: new Date().toISOString()
+    })
+    saveUserData()
+    return true
+  }
+
+  function hasMiniBadge(id) {
+    return miniBadges.value.some(b => b.id === id)
+  }
+
+  function getMiniBadgeDef(id) {
+    return MINI_BADGE_DEFS.find(d => d.id === id)
+  }
+
+  function getMiniBadgeDefs() {
+    return MINI_BADGE_DEFS
   }
 
   function unlockLevel(levelId) {
@@ -226,7 +289,9 @@ export const useGameStore = defineStore('game', () => {
     })
     badges.value = []
     stepBadges.value = []
+    miniBadges.value = []
     _godModeUnlocked = false
+    _consecutiveHigh = 0
     currentLevel.value = 1
     _userId = null
   }
@@ -236,6 +301,7 @@ export const useGameStore = defineStore('game', () => {
     levels,
     badges,
     stepBadges,
+    miniBadges,
     totalCredits,
     totalStepBadges,
     allCompleted,
@@ -244,6 +310,10 @@ export const useGameStore = defineStore('game', () => {
     completeLevel,
     earnStepBadge,
     hasStepBadge,
+    earnMiniBadge,
+    hasMiniBadge,
+    getMiniBadgeDef,
+    getMiniBadgeDefs,
     getStepBadgesForLevel,
     getStepBadgeDefs,
     unlockLevel,
