@@ -1,5 +1,62 @@
-# Vue 3 + Vite
+# AI荣耀闯关 🐵⚔️
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+> 游戏化AI可视化学习平台 · 职业院校云计算+数字媒体专业
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+以热门游戏IP（黑神话：悟空、王者荣耀）为叙事主线，将人工智能知识点设计为六大闯关关卡。通关获得成就勋章并兑换学分。
+
+## 🎮 六大关卡
+
+| 关卡 | 主题 | AI知识点 | 勋章 |
+|:---:|------|---------|:---:|
+| ① 灵石出世 | 🐵 黑神话·悟空 | AI定义/历史/三大流派 | 🪨 |
+| ② 峡谷修炼 | ⚔️ 王者·英雄升级 | 机器学习训练过程 | 🔰 |
+| ③ 火眼金睛 | 👁️ 悟空识破幻象 | 神经网络/计算机视觉 | 🔥 |
+| ④ 王者排位 | 🏆 上分=模型优化 | 深度学习/模型调优 | 👑 |
+| ⑤ 七十二变 | 🌀 悟空72变 | 生成式AI/文生图 | 🪶 |
+| ⑥ 团战时刻 | 🤝 王者团战 | 强化学习/多智能体 | 💥 |
+
+## 🎨 视觉风格
+
+水墨科创（东方科幻）—— 宣纸纹理、墨分五色、卷轴展开动画
+
+## 🛠 技术栈
+
+- **前端**: Vue 3 + Vite + Pinia + Vue Router
+- **渲染**: Canvas 2D（水墨特效）+ Three.js（3D炼丹炉）+ GSAP（动画）
+- **AI推理**: TensorFlow.js（浏览器端）
+- **认证**: localStorage + SHA-256（服务抽象层，可切换后端）
+
+## 🚀 快速开始
+
+```bash
+npm install
+npm run dev      # 开发模式 → http://localhost:5173
+npm run build    # 生产构建
+```
+
+### 预设账户
+
+| 角色 | 用户名 | 密码 |
+|------|--------|------|
+| 教师 | teacher | admin123 |
+| 学生 | 自行注册 | - |
+
+## 📁 项目结构
+
+```
+src/
+├── views/          # 6个关卡视图 + 登录/教师后台
+├── components/     # 18个关卡交互组件
+├── stores/         # Pinia 状态管理（auth + game）
+├── services/       # 服务抽象层（auth + score）
+├── router/         # 路由守卫 + 关卡访问控制
+└── assets/         # 静态资源
+```
+
+## 🏆 学分体系
+
+集齐六枚勋章 → "AI齐天大圣"成就 → 总计13学分 ≈ 一门选修课
+
+## 📄 许可证
+
+MIT
