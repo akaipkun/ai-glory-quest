@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { scoreService } from '../services/scoreService'
 
 export const useGameStore = defineStore('game', () => {
   // --- 关卡进度 ---
@@ -16,6 +17,9 @@ export const useGameStore = defineStore('game', () => {
   // --- 成就系统 ---
   const badges = ref([])
 
+  // 当前用户ID（由 authStore 设置）
+  let _userId = null
+
   const totalCredits = computed(() => {
     const creditMap = { 1: 1, 2: 1, 3: 2, 4: 2, 5: 2, 6: 2 }
     let credits = 0
@@ -27,6 +31,37 @@ export const useGameStore = defineStore('game', () => {
   })
 
   const allCompleted = computed(() => levels.value.every(l => l.completed))
+
+  // --- 数据持久化 ---
+  async function loadUserData(userId) {
+    _userId = userId
+    if (!userId) return
+
+    const data = await scoreService.loadScores(userId)
+    if (data.levels) {
+      // 恢复关卡状态
+      data.levels.forEach((saved, i) => {
+        if (levels.value[i]) {
+          levels.value[i].unlocked = saved.unlocked
+          levels.value[i].completed = saved.completed
+          levels.value[i].score = saved.score
+        }
+      })
+    }
+    if (data.badges) {
+      badges.value = data.badges
+    }
+  }
+
+  async function saveUserData() {
+    if (!_userId) return
+    // 深拷贝避免引用问题
+    const data = {
+      levels: JSON.parse(JSON.stringify(levels.value)),
+      badges: JSON.parse(JSON.stringify(badges.value))
+    }
+    await scoreService.saveScores(_userId, data)
+  }
 
   // --- 操作方法 ---
   function completeLevel(levelId, score) {
@@ -51,6 +86,9 @@ export const useGameStore = defineStore('game', () => {
     if (nextLevel) {
       nextLevel.unlocked = true
     }
+
+    // 自动保存
+    saveUserData()
   }
 
   function unlockLevel(levelId) {
@@ -62,6 +100,25 @@ export const useGameStore = defineStore('game', () => {
     return levels.value.find(l => l.id === levelId)
   }
 
+  // 教师上帝模式：解锁所有关卡
+  function forceUnlockAll() {
+    levels.value.forEach(l => {
+      l.unlocked = true
+    })
+  }
+
+  // 恢复默认锁定状态（退出上帝模式时）
+  function restoreLockState() {
+    // 按顺序重新计算锁定状态
+    for (let i = levels.value.length - 1; i >= 0; i--) {
+      if (i === 0) {
+        levels.value[i].unlocked = true
+      } else {
+        levels.value[i].unlocked = levels.value[i - 1].completed
+      }
+    }
+  }
+
   function reset() {
     levels.value.forEach((l, i) => {
       l.completed = false
@@ -70,6 +127,7 @@ export const useGameStore = defineStore('game', () => {
     })
     badges.value = []
     currentLevel.value = 1
+    _userId = null
   }
 
   return {
@@ -78,9 +136,13 @@ export const useGameStore = defineStore('game', () => {
     badges,
     totalCredits,
     allCompleted,
+    loadUserData,
+    saveUserData,
     completeLevel,
     unlockLevel,
     getLevel,
+    forceUnlockAll,
+    restoreLockState,
     reset
   }
 })

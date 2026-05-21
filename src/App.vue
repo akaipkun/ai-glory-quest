@@ -1,14 +1,17 @@
 <script setup>
 import { watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import InkBackground from './components/ink/InkBackground.vue'
 import { useGameStore } from './stores/gameStore'
+import { useAuthStore } from './stores/authStore'
 
 const router = useRouter()
+const route = useRoute()
 const game = useGameStore()
+const auth = useAuthStore()
 
 // 路由变化时更新当前关卡
-watch(() => router.currentRoute.value.path, (path) => {
+watch(() => route.path, (path) => {
   const match = path.match(/\/level\/(\d+)/)
   if (match) {
     game.currentLevel = parseInt(match[1])
@@ -19,13 +22,19 @@ watch(() => router.currentRoute.value.path, (path) => {
 <template>
   <div id="ink-app">
     <InkBackground />
-    <router-view v-slot="{ Component }">
+
+    <!-- 认证加载中 -->
+    <div v-if="auth.loading" class="ink-loading">
+      <span class="ink-loading__text">墨色晕染中...</span>
+    </div>
+
+    <router-view v-slot="{ Component }" v-else>
       <transition name="page" mode="out-in">
         <component :is="Component" />
       </transition>
     </router-view>
 
-    <div class="ink-footer">
+    <div class="ink-footer" v-if="!route.path.startsWith('/auth')">
       <div class="ink-footer__line"></div>
       <span class="ink-footer__text">AI 荣耀闯关 · 水墨科创</span>
     </div>
@@ -88,5 +97,14 @@ watch(() => router.currentRoute.value.path, (path) => {
 @keyframes page-out {
   0% { opacity: 1; filter: blur(0); transform: scale(1); }
   100% { opacity: 0; filter: blur(8px); transform: scale(0.95); }
+}
+
+.ink-loading {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: var(--paper); z-index: 1000;
+}
+.ink-loading__text {
+  font-family: var(--font-display); font-size: 1.2rem; letter-spacing: 0.2em;
+  color: var(--ink-light); animation: ink-converge 0.8s ease forwards;
 }
 </style>

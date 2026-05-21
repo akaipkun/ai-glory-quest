@@ -17,6 +17,24 @@
       </div>
     </div>
 
+    <!-- 用户栏 -->
+    <div class="home__user-bar">
+      <div class="home__user-info">
+        <span class="home__user-icon">{{ auth.isTeacher ? '👨‍🏫' : '🧑‍🎓' }}</span>
+        <span class="home__user-name">{{ auth.currentUser?.username }}</span>
+        <span class="home__user-role" :class="{ 'home__user-role--teacher': auth.isTeacher }">
+          {{ auth.isTeacher ? '教师' : '学生' }}
+        </span>
+        <span v-if="auth.isGodMode" class="home__user-god">👁️ 上帝模式</span>
+      </div>
+      <div class="home__user-actions">
+        <button v-if="auth.isTeacher" class="home__user-btn" @click="$router.push('/dashboard')">
+          📋 学生管理
+        </button>
+        <button class="home__user-btn" @click="handleLogout">退出</button>
+      </div>
+    </div>
+
     <!-- 关卡地图 -->
     <div class="home__map">
       <div class="home__map-title">
@@ -99,15 +117,22 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
+import { useAuthStore } from '../stores/authStore'
 
 const router = useRouter()
 const game = useGameStore()
+const auth = useAuthStore()
 const heroCanvas = ref(null)
 let heroAnimId = null
 
 function enterLevel(level) {
   if (!level.unlocked) return
   router.push(`/level/${level.id}`)
+}
+
+async function handleLogout() {
+  await auth.logout()
+  router.push('/auth')
 }
 
 function initHeroCanvas() {
@@ -192,11 +217,11 @@ onUnmounted(() => {
 /* Hero */
 .home__hero {
   position: relative;
-  height: 320px;
+  height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 }
 
 .home__hero-canvas {
@@ -245,6 +270,22 @@ onUnmounted(() => {
   color: var(--ink-light);
   letter-spacing: 0.15em;
 }
+
+/* 用户栏 */
+.home__user-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px; margin-bottom: 32px;
+  border: 1px solid var(--ink-pale); background: rgba(245,240,232,0.7);
+}
+.home__user-info { display: flex; align-items: center; gap: 8px; }
+.home__user-icon { font-size: 1.2rem; }
+.home__user-name { font-family: var(--font-display); font-size: 0.9rem; }
+.home__user-role { padding: 1px 8px; border: 1px solid var(--ink-pale); font-size: 0.65rem; color: var(--ink-medium); }
+.home__user-role--teacher { border-color: var(--gold); color: var(--gold); }
+.home__user-god { font-size: 0.7rem; color: var(--cinnabar); animation: glow-pulse 2s ease-in-out infinite; }
+.home__user-actions { display: flex; gap: 8px; }
+.home__user-btn { background: none; border: 1px solid var(--ink-pale); font-family: var(--font-body); font-size: 0.75rem; color: var(--ink-medium); cursor: pointer; padding: 4px 12px; transition: all 0.2s ease; }
+.home__user-btn:hover { border-color: var(--ink-dark); color: var(--ink-black); }
 
 /* 关卡地图 */
 .home__map {
