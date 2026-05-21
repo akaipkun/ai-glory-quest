@@ -25,6 +25,10 @@ export const useAuthStore = defineStore('auth', () => {
         // 加载用户成绩到 gameStore
         const gameStore = useGameStore()
         await gameStore.loadUserData(result.user.id)
+        // 恢复 godMode 状态
+        if (gameStore.isGodModeUnlocked()) {
+          godMode.value = true
+        }
       }
     } catch (e) {
       error.value = e.message

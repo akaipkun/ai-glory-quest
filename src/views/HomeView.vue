@@ -17,24 +17,6 @@
       </div>
     </div>
 
-    <!-- 用户栏 -->
-    <div class="home__user-bar">
-      <div class="home__user-info">
-        <span class="home__user-icon">{{ auth.isTeacher ? '👨‍🏫' : '🧑‍🎓' }}</span>
-        <span class="home__user-name">{{ auth.currentUser?.username }}</span>
-        <span class="home__user-role" :class="{ 'home__user-role--teacher': auth.isTeacher }">
-          {{ auth.isTeacher ? '教师' : '学生' }}
-        </span>
-        <span v-if="auth.isGodMode" class="home__user-god">👁️ 上帝模式</span>
-      </div>
-      <div class="home__user-actions">
-        <button v-if="auth.isTeacher" class="home__user-btn" @click="$router.push('/dashboard')">
-          📋 学生管理
-        </button>
-        <button class="home__user-btn" @click="handleLogout">退出</button>
-      </div>
-    </div>
-
     <!-- 关卡地图 -->
     <div class="home__map">
       <div class="home__map-title">
@@ -47,9 +29,9 @@
           :key="level.id"
           class="level-card"
           :class="{
-            'level-card--unlocked': level.unlocked,
+            'level-card--unlocked': level.unlocked || auth.isTeacher,
             'level-card--completed': level.completed,
-            'level-card--locked': !level.unlocked
+            'level-card--locked': !level.unlocked && !auth.isTeacher
           }"
           @click="enterLevel(level)"
         >
@@ -65,7 +47,7 @@
             <div class="level-card__name">{{ level.name }}</div>
             <div class="level-card__status">
               <span v-if="level.completed" class="level-card__badge">已通关</span>
-              <span v-else-if="level.unlocked" class="level-card__badge level-card__badge--ready">可挑战</span>
+              <span v-else-if="level.unlocked || auth.isTeacher" class="level-card__badge level-card__badge--ready">可挑战</span>
               <span v-else class="level-card__badge level-card__badge--locked">🔒</span>
             </div>
             <div v-if="level.score > 0" class="level-card__score">
@@ -79,12 +61,12 @@
       </div>
     </div>
 
-    <!-- 成就进度 -->
-    <div class="home__progress">
+    <!-- 成就进度 → 影神册入口 -->
+    <div class="home__progress" @click="$router.push('/bestiary')">
       <div class="home__progress-header">
-        <span class="home__progress-label">成就进度</span>
+        <span class="home__progress-label">📜 影神册</span>
         <span class="home__progress-count">
-          {{ game.badges.length }} / 6 勋章 · {{ game.totalCredits }} 学分
+          {{ game.badges.length }}/6关 · {{ game.stepBadges.length }}/{{ game.totalStepBadges }}步 · {{ game.totalCredits }} 学分
         </span>
       </div>
       <div class="home__progress-bar">
@@ -93,17 +75,7 @@
           :style="{ width: (game.badges.length / 6 * 100) + '%' }"
         ></div>
       </div>
-      <div class="home__badges">
-        <div
-          v-for="level in game.levels"
-          :key="'badge-' + level.id"
-          class="home__badge"
-          :class="{ 'home__badge--earned': level.completed }"
-        >
-          <span class="home__badge-icon">{{ level.icon }}</span>
-          <span class="home__badge-name">{{ level.name }}</span>
-        </div>
-      </div>
+      <div class="home__progress-hint">点击翻阅图鉴 →</div>
     </div>
 
     <!-- 重置按钮 -->
@@ -126,13 +98,9 @@ const heroCanvas = ref(null)
 let heroAnimId = null
 
 function enterLevel(level) {
-  if (!level.unlocked) return
+  // 教师可直接进入任何关卡，学生需要关卡已解锁
+  if (!level.unlocked && !auth.isTeacher) return
   router.push(`/level/${level.id}`)
-}
-
-async function handleLogout() {
-  await auth.logout()
-  router.push('/auth')
 }
 
 function initHeroCanvas() {
@@ -270,22 +238,6 @@ onUnmounted(() => {
   color: var(--ink-light);
   letter-spacing: 0.15em;
 }
-
-/* 用户栏 */
-.home__user-bar {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 16px; margin-bottom: 32px;
-  border: 1px solid var(--ink-pale); background: rgba(245,240,232,0.7);
-}
-.home__user-info { display: flex; align-items: center; gap: 8px; }
-.home__user-icon { font-size: 1.2rem; }
-.home__user-name { font-family: var(--font-display); font-size: 0.9rem; }
-.home__user-role { padding: 1px 8px; border: 1px solid var(--ink-pale); font-size: 0.65rem; color: var(--ink-medium); }
-.home__user-role--teacher { border-color: var(--gold); color: var(--gold); }
-.home__user-god { font-size: 0.7rem; color: var(--cinnabar); animation: glow-pulse 2s ease-in-out infinite; }
-.home__user-actions { display: flex; gap: 8px; }
-.home__user-btn { background: none; border: 1px solid var(--ink-pale); font-family: var(--font-body); font-size: 0.75rem; color: var(--ink-medium); cursor: pointer; padding: 4px 12px; transition: all 0.2s ease; }
-.home__user-btn:hover { border-color: var(--ink-dark); color: var(--ink-black); }
 
 /* 关卡地图 */
 .home__map {
@@ -429,6 +381,13 @@ onUnmounted(() => {
   padding: 24px;
   border: 1px solid var(--ink-pale);
   background: rgba(245, 240, 232, 0.6);
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.home__progress:hover {
+  border-color: var(--gold);
+  box-shadow: 0 4px 16px rgba(201, 168, 76, 0.1);
 }
 
 .home__progress-header {
@@ -465,38 +424,18 @@ onUnmounted(() => {
   border-radius: 2px;
 }
 
-.home__badges {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.home__badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border: 1px solid var(--ink-pale);
-  font-size: 0.8rem;
-  opacity: 0.4;
-  filter: grayscale(1);
-  transition: all 0.3s ease;
-}
-
-.home__badge--earned {
-  opacity: 1;
-  filter: none;
-  border-color: var(--gold);
-  background: rgba(201, 168, 76, 0.08);
-}
-
-.home__badge-icon {
-  font-size: 1rem;
-}
-
-.home__badge-name {
+.home__progress-hint {
+  text-align: right;
   font-family: var(--font-body);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
+  color: var(--ink-light);
+  margin-top: 8px;
+  letter-spacing: 0.06em;
+  transition: color 0.3s;
+}
+
+.home__progress:hover .home__progress-hint {
+  color: var(--gold);
 }
 
 .home__reset {

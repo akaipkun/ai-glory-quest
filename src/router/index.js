@@ -15,6 +15,12 @@ const routes = [
     meta: { guest: true }
   },
   {
+    path: '/bestiary',
+    name: 'Bestiary',
+    component: () => import('../views/BestiaryView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/dashboard',
     name: 'Dashboard',
     component: () => import('../views/TeacherDashboard.vue'),

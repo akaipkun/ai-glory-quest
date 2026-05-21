@@ -24,7 +24,12 @@
         <button class="level4__nav-back" @click="$router.push('/')">← 返回</button>
         <div class="level4__nav-steps">
           <span v-for="(step, i) in steps" :key="i" class="level4__nav-step"
-            :class="{ 'level4__nav-step--active': currentStep === i, 'level4__nav-step--done': i < currentStep }">{{ i + 1 }}</span>
+            :class="{
+              'level4__nav-step--active': currentStep === i,
+              'level4__nav-step--done': i < currentStep,
+              'level4__nav-step--clickable': auth.isGodMode
+            }"
+            @click="auth.isGodMode ? goToStep(i) : null">{{ i + 1 }}</span>
         </div>
         <span class="level4__nav-title">{{ steps[currentStep] }}</span>
       </div>
@@ -67,12 +72,14 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
+import { useAuthStore } from '../stores/authStore'
 import HeroPool from '../components/level4/HeroPool.vue'
 import RankedMatch from '../components/level4/RankedMatch.vue'
 import FinalShowdown from '../components/level4/FinalShowdown.vue'
 
 const router = useRouter()
 const game = useGameStore()
+const auth = useAuthStore()
 
 const showIntro = ref(true)
 const showCompletion = ref(false)
@@ -89,13 +96,17 @@ const finalScore = ref(60)
 
 function startLevel() { showIntro.value = false }
 
+function goToStep(index) { if (auth.isGodMode) { currentStep.value = index } }
+
 function onPoolComplete(score) {
   heroScore = score
+  game.earnStepBadge(4, 0)
   currentStep.value = 1
 }
 
 function onRankedComplete(score) {
   finalScore.value = score
+  game.earnStepBadge(4, 1)
   currentStep.value = 2
 }
 
@@ -214,6 +225,8 @@ onUnmounted(() => {
 .level4__nav-step { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--ink-pale); font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-light); transition: all 0.3s ease; }
 .level4__nav-step--active { border-color: var(--cinnabar); color: var(--cinnabar); background: rgba(194,58,43,0.05); }
 .level4__nav-step--done { border-color: var(--verdant); color: var(--verdant); }
+.level4__nav-step--clickable { cursor: pointer; }
+.level4__nav-step--clickable:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
 .level4__nav-title { flex: 1; font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 0.15em; text-align: right; }
 
 .level4__content { padding-top: 60px; min-height: 100vh; }

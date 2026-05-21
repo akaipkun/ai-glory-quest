@@ -31,7 +31,12 @@
             v-for="(step, i) in steps"
             :key="i"
             class="level2__nav-step"
-            :class="{ 'level2__nav-step--active': currentStep === i, 'level2__nav-step--done': i < currentStep }"
+            :class="{
+              'level2__nav-step--active': currentStep === i,
+              'level2__nav-step--done': i < currentStep,
+              'level2__nav-step--clickable': auth.isGodMode
+            }"
+            @click="auth.isGodMode ? goToStep(i) : null"
           >
             {{ i + 1 }}
           </span>
@@ -91,12 +96,14 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
+import { useAuthStore } from '../stores/authStore'
 import HeroTraining from '../components/level2/HeroTraining.vue'
 import AlchemyFurnace from '../components/level2/AlchemyFurnace.vue'
 import ArenaRanking from '../components/level2/ArenaRanking.vue'
 
 const router = useRouter()
 const game = useGameStore()
+const auth = useAuthStore()
 
 const showIntro = ref(true)
 const showCompletion = ref(false)
@@ -116,14 +123,19 @@ function startLevel() {
   showIntro.value = false
 }
 
+function goToStep(index) {
+  if (auth.isGodMode) { currentStep.value = index }
+}
+
 function onTrainingComplete(accuracy) {
   trainingAccuracy = accuracy
+  game.earnStepBadge(2, 0)
   currentStep.value = 1
 }
 
 function onFurnaceComplete(best) {
   furnaceBest = best
-  // 将炼丹炉的最佳准确率传给排位赛
+  game.earnStepBadge(2, 1)
   const finalAccuracy = Math.max(trainingAccuracy, furnaceBest)
   if (arenaRef.value) {
     arenaRef.value.setAccuracy(finalAccuracy)
@@ -345,6 +357,15 @@ onUnmounted(() => {
 .level2__nav-step--done {
   border-color: var(--verdant);
   color: var(--verdant);
+}
+
+.level2__nav-step--clickable {
+  cursor: pointer;
+}
+.level2__nav-step--clickable:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,168,76,0.08);
 }
 
 .level2__nav-title {

@@ -24,7 +24,12 @@
         <button class="level5__nav-back" @click="$router.push('/')">← 返回</button>
         <div class="level5__nav-steps">
           <span v-for="(step, i) in steps" :key="i" class="level5__nav-step"
-            :class="{ 'level5__nav-step--active': currentStep === i, 'level5__nav-step--done': i < currentStep }">{{ i + 1 }}</span>
+            :class="{
+              'level5__nav-step--active': currentStep === i,
+              'level5__nav-step--done': i < currentStep,
+              'level5__nav-step--clickable': auth.isGodMode
+            }"
+            @click="auth.isGodMode ? goToStep(i) : null">{{ i + 1 }}</span>
         </div>
         <span class="level5__nav-title">{{ steps[currentStep] }}</span>
       </div>
@@ -66,12 +71,14 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
+import { useAuthStore } from '../stores/authStore'
 import TransformationWorkshop from '../components/level5/TransformationWorkshop.vue'
 import LatentSpace from '../components/level5/LatentSpace.vue'
 import AIGeneratedDetection from '../components/level5/AIGeneratedDetection.vue'
 
 const router = useRouter()
 const game = useGameStore()
+const auth = useAuthStore()
 
 const showIntro = ref(true)
 const showCompletion = ref(false)
@@ -83,7 +90,8 @@ let introAnimId = null
 let completeAnimId = null
 
 function startLevel() { showIntro.value = false }
-function goNext() { if (currentStep.value < 2) currentStep.value++ }
+function goToStep(index) { if (auth.isGodMode) { currentStep.value = index } }
+function goNext() { if (currentStep.value < 2) { game.earnStepBadge(5, currentStep.value); currentStep.value++ } }
 function finishLevel(score = 80) { game.completeLevel(5, score); showCompletion.value = true; initCompleteCanvas() }
 function goNextLevel() { game.unlockLevel(6); router.push('/level/6') }
 
@@ -186,6 +194,8 @@ onUnmounted(() => {
 .level5__nav-step { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--ink-pale); font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-light); transition: all 0.3s ease; }
 .level5__nav-step--active { border-color: var(--cinnabar); color: var(--cinnabar); background: rgba(194,58,43,0.05); }
 .level5__nav-step--done { border-color: var(--verdant); color: var(--verdant); }
+.level5__nav-step--clickable { cursor: pointer; }
+.level5__nav-step--clickable:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
 .level5__nav-title { flex: 1; font-family: var(--font-display); font-size: 0.9rem; letter-spacing: 0.15em; text-align: right; }
 
 .level5__content { padding-top: 60px; min-height: 100vh; }

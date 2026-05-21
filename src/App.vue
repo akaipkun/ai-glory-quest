@@ -2,6 +2,7 @@
 import { watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import InkBackground from './components/ink/InkBackground.vue'
+import AccountBadge from './components/ink/AccountBadge.vue'
 import { useGameStore } from './stores/gameStore'
 import { useAuthStore } from './stores/authStore'
 
@@ -28,16 +29,21 @@ watch(() => route.path, (path) => {
       <span class="ink-loading__text">墨色晕染中...</span>
     </div>
 
-    <router-view v-slot="{ Component }" v-else>
-      <transition name="page" mode="out-in">
-        <component :is="Component" />
-      </transition>
-    </router-view>
+    <template v-else>
+      <!-- 全局账户印章（右上角） -->
+      <AccountBadge />
 
-    <div class="ink-footer" v-if="!route.path.startsWith('/auth')">
-      <div class="ink-footer__line"></div>
-      <span class="ink-footer__text">AI 荣耀闯关 · 水墨科创</span>
-    </div>
+      <router-view v-slot="{ Component }">
+        <transition name="page" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+
+      <div class="ink-footer" v-if="!route.path.startsWith('/auth')">
+        <div class="ink-footer__line"></div>
+        <span class="ink-footer__text">AI 荣耀闯关 · 水墨科创</span>
+      </div>
+    </template>
   </div>
 </template>
 

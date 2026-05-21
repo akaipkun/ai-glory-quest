@@ -31,7 +31,12 @@
             v-for="(step, i) in steps"
             :key="i"
             class="level1__nav-step"
-            :class="{ 'level1__nav-step--active': currentStep === i, 'level1__nav-step--done': i < currentStep }"
+            :class="{
+              'level1__nav-step--active': currentStep === i,
+              'level1__nav-step--done': i < currentStep,
+              'level1__nav-step--clickable': auth.isGodMode
+            }"
+            @click="auth.isGodMode ? goToStep(i) : null"
           >
             {{ i + 1 }}
           </span>
@@ -90,12 +95,14 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useGameStore } from '../stores/gameStore'
+import { useAuthStore } from '../stores/authStore'
 import TimelineScroll from '../components/level1/TimelineScroll.vue'
 import TuringTest from '../components/level1/TuringTest.vue'
 import ThreeRealms from '../components/level1/ThreeRealms.vue'
 
 const router = useRouter()
 const game = useGameStore()
+const auth = useAuthStore()
 
 const showIntro = ref(true)
 const showCompletion = ref(false)
@@ -111,8 +118,13 @@ function startLevel() {
   showIntro.value = false
 }
 
+function goToStep(index) {
+  if (auth.isGodMode) { currentStep.value = index }
+}
+
 function goNext() {
   if (currentStep.value < 2) {
+    game.earnStepBadge(1, currentStep.value)
     currentStep.value++
   }
 }
@@ -354,6 +366,15 @@ onUnmounted(() => {
 .level1__nav-step--done {
   border-color: var(--verdant);
   color: var(--verdant);
+}
+
+.level1__nav-step--clickable {
+  cursor: pointer;
+}
+.level1__nav-step--clickable:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,168,76,0.08);
 }
 
 .level1__nav-title {
